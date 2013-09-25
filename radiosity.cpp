@@ -1,4 +1,4 @@
-﻿class Radiosity {
+class Radiosity {
 
 public:
   // Gauss-Seidel法

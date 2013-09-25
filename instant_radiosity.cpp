@@ -1,4 +1,4 @@
-﻿void InstantRadiosity( int N, double rho )
+void InstantRadiosity( int N, double rho )
 {
   double Start = N;
 

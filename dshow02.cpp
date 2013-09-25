@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <dshow.h>
 #include <atlbase.h>
 

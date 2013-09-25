@@ -1,4 +1,4 @@
-﻿// cf. http://en.wikipedia.org/wiki/Slice_sampling
+// cf. http://en.wikipedia.org/wiki/Slice_sampling
 //   & http://www.singularpoint.org/blog/math/slice-sampling/
 template <typename evaluatable_function>
 std::vector<double> &&

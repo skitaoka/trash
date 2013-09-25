@@ -1,4 +1,4 @@
-﻿// Peer 間のメモリ転送速度を測る。
+// Peer 間のメモリ転送速度を測る。
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>

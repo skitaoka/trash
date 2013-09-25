@@ -1,4 +1,4 @@
-﻿import java.awt.AWTKeyStroke;
+import java.awt.AWTKeyStroke;
 import java.awt.FlowLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.InputEvent;

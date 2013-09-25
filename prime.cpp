@@ -1,4 +1,4 @@
-﻿#include <vector>
+#include <vector>
 #include <cstdio>
 
 int main(int argc, char * argv[])

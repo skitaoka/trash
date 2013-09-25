@@ -1,4 +1,4 @@
-﻿final class BitMagic {
+final class BitMagic {
   private static final long LOG2_HASH = 0x03f566ed27179461L; // マジックナンバー
   private static final int[] log2_hash_table;
   

@@ -1,4 +1,4 @@
-﻿// SOM
+// SOM
 p_new = p_old + alpah * h(m, m*) (p_input - p_old)
 h(m, m*) = exp(-|win-near|^2/s^2)
 

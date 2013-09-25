@@ -1,4 +1,4 @@
-﻿
+
 public class EM {
 
 	public static void main( String[] args )

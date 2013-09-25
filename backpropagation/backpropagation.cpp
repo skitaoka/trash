@@ -1,4 +1,4 @@
-﻿#include "BackPropagation.hpp"
+#include "BackPropagation.hpp"
 
 BackPropagation::BackPropagation( int input, int hidden, int output )
 	: eta_( 0.3 )

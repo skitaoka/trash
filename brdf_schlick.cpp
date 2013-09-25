@@ -1,4 +1,4 @@
-﻿float G(float const v, float const sigma)
+float G(float const v, float const sigma)
 {
   return v / (sigma - sigma * v + v);
 }

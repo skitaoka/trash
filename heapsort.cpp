@@ -1,4 +1,4 @@
-﻿//
+//
 // Wikipedia のヒープソートがきれいだったので実装してみる．
 //
 template <typename T>

@@ -1,4 +1,4 @@
-﻿// cf. Markov Chain Monte Carlo Method without Detailed Balance; 
+// cf. Markov Chain Monte Carlo Method without Detailed Balance; 
 //     http://d.hatena.ne.jp/teramonagi/20111120/1321785155
 double w[N]; // 分布
 double c[N]; // c[i] = c[i-1] + w[i], where c[-1] = 0;

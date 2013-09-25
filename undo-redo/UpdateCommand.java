@@ -1,4 +1,4 @@
-﻿public class UpdateCommand implements ICommand {
+public class UpdateCommand implements ICommand {
   private DataModel model_;
   private String prevText_;
   private String nextText_;

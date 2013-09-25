@@ -1,4 +1,4 @@
-﻿// Bilateral Filter
+// Bilateral Filter
 for (int s = 0; s < n; ++s) {
   double weight = 0.0;
   double signal = 0.0;

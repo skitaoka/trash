@@ -1,4 +1,4 @@
-﻿#if defined( WIN32 )
+#if defined( WIN32 )
 #	if defined( __cplusplus )
 #		define DLLEXPORT extern "C" __declspec( dllexport )
 #	else

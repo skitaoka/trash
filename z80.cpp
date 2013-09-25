@@ -1,4 +1,4 @@
-﻿void cpu8086()
+void cpu8086()
 {
 #define CALL( label ) context_statck.push_back(__LINE__) ; goto label ; case __LINE__ :
 #define RET() break

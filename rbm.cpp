@@ -1,4 +1,4 @@
-﻿// Restricted Boltmann Machine
+// Restricted Boltmann Machine
 // cf. http://en.wikipedia.org/wiki/Restricted_Boltzmann_machine
 
 // これを多段に拡張すると Deep Learning できる！

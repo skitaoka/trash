@@ -1,4 +1,4 @@
-﻿int main(int argv,char ** argc)
+int main(int argv,char ** argc)
 {
     CONSOLE_SCREEN_INFO c_clore = FOREGROUND_RED;
     CONSOLE_SCREEN_INFO std_clore = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE ;

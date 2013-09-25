@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <memory>
 
 inline std::auto_ptr<std::string> remove_ext( std::string& filename )

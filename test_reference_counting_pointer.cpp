@@ -1,4 +1,4 @@
-﻿#if !defined( REFERENCE_COUNTING_POINTER_HPP )
+#if !defined( REFERENCE_COUNTING_POINTER_HPP )
 #define REFERENCE_COUNTING_POINTER_HPP
 
 #include <cassert>

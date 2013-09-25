@@ -1,4 +1,4 @@
-﻿#if !defined( BIT_MAGIC_HPP )
+#if !defined( BIT_MAGIC_HPP )
 #define BIT_MAGIC_HPP
 
 /**

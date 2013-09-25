@@ -1,4 +1,4 @@
-﻿///
+///
 /// Binary Indexed Tree (Fenwick Tree) による累積頻度表の実装.
 /// cf.  http://d.hatena.ne.jp/naoya/20090606/1244284915
 ///

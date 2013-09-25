@@ -1,4 +1,4 @@
-﻿#define NOMINMAX
+#define NOMINMAX
 #define STRICT
 #include <windows.h>
 #include <tchar.h>

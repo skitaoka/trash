@@ -1,4 +1,4 @@
-﻿// D 次元のベクトルから L ビットのハッシュ値を生成する.
+// D 次元のベクトルから L ビットのハッシュ値を生成する.
 // cf. http://d.hatena.ne.jp/tsubosaka/20090928/1254147181
 std::vector<bool> make_lsh(std::vector<std::pair<std::size_t, double>> const & x, std::size_t const L)
 {

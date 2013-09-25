@@ -1,4 +1,4 @@
-﻿/**
+/**
  * cf. https://docs.google.com/document/d/1w-jQlG3yfEjiWNzSgZIHV_gm2FvHI7IKsELSLVuP6ow/edit
  */
 

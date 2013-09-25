@@ -1,4 +1,4 @@
-﻿#if !defined( BACKPROPAGATION_HPP )
+#if !defined( BACKPROPAGATION_HPP )
 #define BACKPROPAGATION_HPP
 
 #include <cstdio>

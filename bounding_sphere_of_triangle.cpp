@@ -1,4 +1,4 @@
-﻿// 三角形にフィットする球を計算する。
+// 三角形にフィットする球を計算する。
 float4 sphere(float3 const v1, float3 const v2, float3 const v3)
 {
   float3 const a = v3 - v2;

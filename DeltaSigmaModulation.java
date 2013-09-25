@@ -1,4 +1,4 @@
-﻿// ΔΣ変調
+// ΔΣ変調
 final class DeltaSigmaModulation {
   public static void main(String[] args) {
     final int nFinalResolution = 256;

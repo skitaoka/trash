@@ -1,4 +1,4 @@
-﻿function h2x(hiragana)
+function h2x(hiragana)
 	local h = string.gsub(hiragana, "[%s　]", "");
 	return h
 end

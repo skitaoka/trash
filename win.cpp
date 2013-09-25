@@ -1,4 +1,4 @@
-﻿class base_WindowClass
+class base_WindowClass
 {
 protected:
   LRESULT WindowProc(HWND, UINT, WPARAM, LPARAM);

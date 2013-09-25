@@ -1,4 +1,4 @@
-﻿//
+//
 // 高速な倍精度 exp の実装
 //   cf. http://www.slideshare.net/herumi/exp-9499790
 //

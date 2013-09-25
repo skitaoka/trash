@@ -1,4 +1,4 @@
-﻿public class CommandInvoker {
+public class CommandInvoker {
   private Stack<ICommand> undoStack_;
   private Stack<ICommand> redoStack_;
   

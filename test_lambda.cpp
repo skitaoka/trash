@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ラムダの実装
  */
 #include <iostream>

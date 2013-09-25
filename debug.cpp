@@ -1,4 +1,4 @@
-﻿#define guard(func)											\
+#define guard(func)											\
 	{														\
 		static const TCHAR __FUNC_NAME__[] = TEXT(#func);	\
 		try {

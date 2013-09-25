@@ -1,4 +1,4 @@
-﻿#include <vector>
+#include <vector>
 #include <iostream>
 
 typedef std::size_t (*hash_function)( char const * );

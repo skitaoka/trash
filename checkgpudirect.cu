@@ -1,4 +1,4 @@
-﻿// 同一バス上にある Peer 間のメモリ転送ができるかチェックする。
+// 同一バス上にある Peer 間のメモリ転送ができるかチェックする。
 #include <cstdio>
 #include <cstdlib>
 

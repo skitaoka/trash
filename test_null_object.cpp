@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Null Object Sample
  */
 

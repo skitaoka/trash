@@ -1,4 +1,4 @@
-﻿//
+//
 // Generating Samples w/o Concentric Disc Map
 //
 int i; // the index of a sample

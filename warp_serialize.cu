@@ -1,4 +1,4 @@
-﻿// __ballot により warp 中のスレッドを同期化するサンプル。
+// __ballot により warp 中のスレッドを同期化するサンプル。
 #include <iostream>
 #include <cuda_runtime.h>
 

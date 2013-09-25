@@ -1,4 +1,4 @@
-﻿// 隠れマルコフモデル(hidden Markov model; HMM)
+// 隠れマルコフモデル(hidden Markov model; HMM)
 public class HMM
 {
 	// 状態の有限集合Q={q_{1},...,q_{N}}

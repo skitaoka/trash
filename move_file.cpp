@@ -1,4 +1,4 @@
-﻿// ファイルの削除と移動をアトミックに処理する.
+// ファイルの削除と移動をアトミックに処理する.
 
 #ifdef _WIN32
 #include <windows.h> // DeleteFile, MoveFileEx のため

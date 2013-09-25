@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 
 template <std::size_t Sz>
 union hoge

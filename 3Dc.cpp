@@ -1,4 +1,4 @@
-﻿//
+//
 // 3Dc: 法線マップに特化した非可逆圧縮の仕組み
 // cf. http://www.watch.impress.co.jp/game/docs/20040505/rx800.htm
 //

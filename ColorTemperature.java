@@ -1,4 +1,4 @@
-﻿
+
 final class ColorTemperature {
   // 360-830[nm](1[nm]刻み)
   private static final int CIX1964_10deg_XYZ_CMF_N = 830 - 360 + 1;

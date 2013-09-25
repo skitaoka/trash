@@ -1,4 +1,4 @@
-﻿float Raymarcher::integrate(V2f const & pos, V2f const & dir, float const absorption) const
+float Raymarcher::integrate(V2f const & pos, V2f const & dir, float const absorption) const
 {
   // Determinate intersection with the voxel buffer
   float t0, t1;
