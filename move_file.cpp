@@ -1,15 +1,15 @@
-// ƒtƒ@ƒCƒ‹‚Ìíœ‚ÆˆÚ“®‚ğƒAƒgƒ~ƒbƒN‚Éˆ—‚·‚é.
+ï»¿// ãƒ•ã‚¡ã‚¤ãƒ«ã®å‰Šé™¤ã¨ç§»å‹•ã‚’ã‚¢ãƒˆãƒŸãƒƒã‚¯ã«å‡¦ç†ã™ã‚‹.
 
 #ifdef _WIN32
-#include <windows.h> // DeleteFile, MoveFileEx ‚Ì‚½‚ß
+#include <windows.h> // DeleteFile, MoveFileEx ã®ãŸã‚
 #else
-#include <cstdio>    // rename ‚Ì‚½‚ß
-#include <unistd.h>  // unlink ‚Ì‚½‚ß
+#include <cstdio>    // rename ã®ãŸã‚
+#include <unistd.h>  // unlink ã®ãŸã‚
 #endif
 
-// íœ
-// ¬Œ÷‚µ‚½‚Æ‚«‚É 0 ‚ª•Ô‚éB
-// ¸”s‚µ‚½‚Æ‚«‚Í -1 ‚ª•Ô‚éB
+// å‰Šé™¤
+// æˆåŠŸã—ãŸã¨ãã« 0 ãŒè¿”ã‚‹ã€‚
+// å¤±æ•—ã—ãŸã¨ãã¯ -1 ãŒè¿”ã‚‹ã€‚
 int remove_file(char const * const path)
 {
 #ifdef _WIN32
@@ -19,11 +19,11 @@ int remove_file(char const * const path)
 #endif
 }
 
-// ˆÚ“®
-// ƒtƒ@ƒCƒ‹–¼‚ğ path_old ‚©‚ç path_new ‚Ö•Ï‚¦‚éB
-// path_new ‚ª‚·‚Å‚É‘¶İ‚µ‚Ä‚éê‡‚ÍAã‘‚«‚·‚éB
-// ¬Œ÷‚µ‚½‚Æ‚«‚É 0 ‚ª•Ô‚éB
-// ¸”s‚µ‚½‚Æ‚«‚Í -1 ‚ª•Ô‚éB
+// ç§»å‹•
+// ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ path_old ã‹ã‚‰ path_new ã¸å¤‰ãˆã‚‹ã€‚
+// path_new ãŒã™ã§ã«å­˜åœ¨ã—ã¦ã‚‹å ´åˆã¯ã€ä¸Šæ›¸ãã™ã‚‹ã€‚
+// æˆåŠŸã—ãŸã¨ãã« 0 ãŒè¿”ã‚‹ã€‚
+// å¤±æ•—ã—ãŸã¨ãã¯ -1 ãŒè¿”ã‚‹ã€‚
 int rename_file(char const * const path_old, char const * const path_new)
 {
 #ifdef _WIN32
@@ -34,15 +34,15 @@ int rename_file(char const * const path_old, char const * const path_new)
 }
 
 /*
-Java ‚ÅƒAƒgƒ~ƒbƒN‚Éã‘‚«ƒŠƒlƒCƒ€‚·‚éè’i‚Í 1.7 ˆÈ~‚Å‚È‚¢‚Æ‚È‚¢B
-** Files.move(source, target, StandardCopyOption.ATOMIC_MOVE)B
+Java ã§ã‚¢ãƒˆãƒŸãƒƒã‚¯ã«ä¸Šæ›¸ããƒªãƒã‚¤ãƒ ã™ã‚‹æ‰‹æ®µã¯ 1.7 ä»¥é™ã§ãªã„ã¨ãªã„ã€‚
+** Files.move(source, target, StandardCopyOption.ATOMIC_MOVE)ã€‚
 
-* Windows ‚Å‚Í Java ‚Å FileReader ‚Æ‚© FileInputStream ‚Åƒtƒ@ƒCƒ‹‚ğŠJ‚¢‚Ä‚¢‚é‚ÆAã‹L‚Ì‘€ì‚ª¸”s‚·‚éB
-* Linux ‚Å‚Í¬Œ÷‚·‚éBƒtƒ@ƒCƒ‹“ü—Í‚ÍŒp‘±‚µ‚Ä‰Â”\‚É‚È‚Á‚Ä‚¢‚éiƒn[ƒhƒŠƒ“ƒN\‘¢‚Ì‚¨‚©‚°jB
-** Windows ‚Å‚à Vista ˆÈ~‚Åƒn[ƒhƒŠƒ“ƒN‚ğì‚ê‚é‚æ‚¤‚É‚È‚Á‚½‚Ì‚ÅA‚±‚ê‚ğ—˜—p‚µ‚æ‚¤I
-*** Files.createLink(newLink, existingFile); // ‘Î‰‚µ‚Ä‚¢‚é‚Ì‚Í Java 1.7 ˆÈ~cc
-*** ‚Ç‚¤‚µ‚Ä‚à‚Æ‚¢‚¤ê‡‚ÍAƒRƒ}ƒ“ƒh‚ğ’¼Ú‚æ‚Ñ‚¾‚·‚©B
+* Windows ã§ã¯ Java ã§ FileReader ã¨ã‹ FileInputStream ã§ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã„ã¦ã„ã‚‹ã¨ã€ä¸Šè¨˜ã®æ“ä½œãŒå¤±æ•—ã™ã‚‹ã€‚
+* Linux ã§ã¯æˆåŠŸã™ã‚‹ã€‚ãƒ•ã‚¡ã‚¤ãƒ«å…¥åŠ›ã¯ç¶™ç¶šã—ã¦å¯èƒ½ã«ãªã£ã¦ã„ã‚‹ï¼ˆãƒãƒ¼ãƒ‰ãƒªãƒ³ã‚¯æ§‹é€ ã®ãŠã‹ã’ï¼‰ã€‚
+** Windows ã§ã‚‚ Vista ä»¥é™ã§ãƒãƒ¼ãƒ‰ãƒªãƒ³ã‚¯ã‚’ä½œã‚Œã‚‹ã‚ˆã†ã«ãªã£ãŸã®ã§ã€ã“ã‚Œã‚’åˆ©ç”¨ã—ã‚ˆã†ï¼
+*** Files.createLink(newLink, existingFile); // å¯¾å¿œã—ã¦ã„ã‚‹ã®ã¯ Java 1.7 ä»¥é™â€¦â€¦
+*** ã©ã†ã—ã¦ã‚‚ã¨ã„ã†å ´åˆã¯ã€ã‚³ãƒãƒ³ãƒ‰ã‚’ç›´æ¥ã‚ˆã³ã ã™ã‹ã€‚
 **** Windows: mklink /h newLink existingFile
-***** Vista ˆÈ~‚Å‰Â”\AXP ‚Í•s‰ÂA‚³‚ç‚ÉŠÇ—ÒŒ ŒÀ‚ª•K—v‚©‚àB
+***** Vista ä»¥é™ã§å¯èƒ½ã€XP ã¯ä¸å¯ã€ã•ã‚‰ã«ç®¡ç†è€…æ¨©é™ãŒå¿…è¦ã‹ã‚‚ã€‚
 **** Linux: ln existingFile newLink
 */

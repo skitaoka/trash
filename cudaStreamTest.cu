@@ -1,4 +1,4 @@
-//
+﻿//
 // nvcc -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\lib\x64" -lcudadevrt -rdc=true  -O2 -arch=sm_35 -Xcompiler "/wd4819 /MT" cudaStreamTest.cu
 //
 #include <vector>

@@ -1,4 +1,4 @@
-// __ballot ‚É‚æ‚è warp ’†‚ÌƒXƒŒƒbƒh‚ð“¯Šú‰»‚·‚éƒTƒ“ƒvƒ‹B
+ï»¿// __ballot ã«ã‚ˆã‚Š warp ä¸­ã®ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’åŒæœŸåŒ–ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«ã€‚
 #include <iostream>
 #include <cuda_runtime.h>
 

@@ -1,4 +1,4 @@
-#if !defined( BACKPROPAGATION_HPP )
+ï»¿#if !defined( BACKPROPAGATION_HPP )
 #define BACKPROPAGATION_HPP
 
 #include <cstdio>
@@ -8,8 +8,8 @@
 #define for if ( 0 ) ; else for
 
 /**
- * ƒjƒ…[ƒ‰ƒ‹ƒlƒbƒgƒ[ƒN
- * Œë·‹t“`”d–@(ƒoƒbƒNƒvƒƒpƒQ[ƒVƒ‡ƒ“)
+ * ãƒ‹ãƒ¥ãƒ¼ãƒ©ãƒ«ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯
+ * èª¤å·®é€†ä¼æ’­æ³•(ãƒãƒƒã‚¯ãƒ—ãƒ­ãƒ‘ã‚²ãƒ¼ã‚·ãƒ§ãƒ³)
  */
 class BackPropagation
 {
@@ -17,37 +17,37 @@ public:
 	BackPropagation( int input, int hidden, int output );
 	~BackPropagation();
 
-	//! “ü—Í‚ğ—^‚¦‚ÄŒ‹‰Ê‚ğ“¾‚é
+	//! å…¥åŠ›ã‚’ä¸ãˆã¦çµæœã‚’å¾—ã‚‹
 	void foward( double* inputLayer );
 
-	//! ‹³tƒf[ƒ^‚ğ—^‚¦‚ÄŠwK
+	//! æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä¸ãˆã¦å­¦ç¿’
 	void back( double* inputLayer, double* teach );
 
-	//! Œë·‚ğ“¾‚é
+	//! èª¤å·®ã‚’å¾—ã‚‹
 	double getError( double* teach );
 
 	void debugOutput();
 
 private:
-	double eta_; //!< ŠwKŒW”
-	double alpha_; //!< ‘O‰ñ‚Ì•Ï‰»—Ê‚©‚çŠwK—Ê‚ğƒRƒ“ƒgƒ[ƒ‹‚·‚é‚½‚ß‚Ì‚à‚Ì
+	double eta_; //!< å­¦ç¿’ä¿‚æ•°
+	double alpha_; //!< å‰å›ã®å¤‰åŒ–é‡ã‹ã‚‰å­¦ç¿’é‡ã‚’ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã™ã‚‹ãŸã‚ã®ã‚‚ã®
 
-	int input_; //!< “ü—Í‘w”
-	int hidden_; //!< ’†ŠÔ‘w”
-	int output_; //!< o—Í‘w”
+	int input_; //!< å…¥åŠ›å±¤æ•°
+	int hidden_; //!< ä¸­é–“å±¤æ•°
+	int output_; //!< å‡ºåŠ›å±¤æ•°
 
-	double* hiddenLayer_; //!< ’†ŠÔ‘w
-	double* outputLayer_; //!< o—Í‘w
-	double** wij_; //!< ‰×di“ü—Í‘w->’†ŠÔ‘wj
-	double** wjk_; //!< ‰×di’†ŠÔ‘w->o—Í‘wj
+	double* hiddenLayer_; //!< ä¸­é–“å±¤
+	double* outputLayer_; //!< å‡ºåŠ›å±¤
+	double** wij_; //!< è·é‡ï¼ˆå…¥åŠ›å±¤->ä¸­é–“å±¤ï¼‰
+	double** wjk_; //!< è·é‡ï¼ˆä¸­é–“å±¤->å‡ºåŠ›å±¤ï¼‰
 
-	double* deltaj_; //!< Œë·i“ü—Í‘w->’†ŠÔ‘wj
-	double* deltak_; //!< Œë·i’†ŠÔ‘w->o—Í‘wj
-	double** deltaWji_; //!< ‰×dC³’li“ü—Í‘w->’†ŠÔ‘wj
-	double** deltaWkj_; //!< ‰×dC³’li“ü—Í‘w->’†ŠÔ‘wj
+	double* deltaj_; //!< èª¤å·®ï¼ˆå…¥åŠ›å±¤->ä¸­é–“å±¤ï¼‰
+	double* deltak_; //!< èª¤å·®ï¼ˆä¸­é–“å±¤->å‡ºåŠ›å±¤ï¼‰
+	double** deltaWji_; //!< è·é‡ä¿®æ­£å€¤ï¼ˆå…¥åŠ›å±¤->ä¸­é–“å±¤ï¼‰
+	double** deltaWkj_; //!< è·é‡ä¿®æ­£å€¤ï¼ˆå…¥åŠ›å±¤->ä¸­é–“å±¤ï¼‰
 
 private:
-	//! ƒVƒOƒ‚ƒCƒhŠÖ”
+	//! ã‚·ã‚°ãƒ¢ã‚¤ãƒ‰é–¢æ•°
 	inline static double sigmoid( double x )
 	{
 		return 1.0 / ( 1.0 + exp( -x ) );

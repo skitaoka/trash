@@ -10,14 +10,13 @@
 int main()
 {
 	std::vector<std::string> lines;
-	std::string temp;
+	std::string line;
 
-	while ( !!std::cin )
-	{
-		std::getline( std::cin, temp );
-		lines.push_back( temp );
+	while (std::cin) {
+		std::getline(std::cin, line);
+		lines.push_back(line);
 	}
 
-	std::copy( lines.rbegin(), lines.rend(),
-			std::ostream_iterator<std::string>( std::cout, "\n" ) );
+	std::copy(lines.rbegin(), lines.rend(),
+			std::ostream_iterator<std::string>(std::cout, "\n"));
 }

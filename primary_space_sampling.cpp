@@ -1,4 +1,4 @@
-#include <cmath>
+ï»¿#include <cmath>
 #include <ctime>
 
 #include <iterator>
@@ -17,7 +17,7 @@ int main()
 
   std::vector<int> histgram(100);
   for (int i = 0; i < 10000; ++i) {
-  	// 1,000 ŽŸŒ³ƒxƒNƒgƒ‹‚ð¶¬‚µ‚ÄŒ´“_‚©‚ç‚Ì‹——£‚ð‘ª‚é
+  	// 1,000 æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«ã‚’ç”Ÿæˆã—ã¦åŽŸç‚¹ã‹ã‚‰ã®è·é›¢ã‚’æ¸¬ã‚‹
     double distance = 0.0;
     for (int k = 0; k < 1000; ++k) {
       double const x = distribution(engine);
@@ -25,7 +25,7 @@ int main()
     }
     distance = std::sqrt(distance);
 
-    // Œ´“_‚©‚ç‚Ì‹——£‚ÌƒqƒXƒgƒOƒ‰ƒ€‚ð‚Â‚­‚é
+    // åŽŸç‚¹ã‹ã‚‰ã®è·é›¢ã®ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’ã¤ãã‚‹
     ++histgram[static_cast<int>(distance * histgram.size())];
   }
 

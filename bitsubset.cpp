@@ -1,10 +1,10 @@
-#include <iostream>
+ï»¿#include <iostream>
 
 int main()
 {
   typedef unsigned long long int ulong_t;
 
-  // ƒrƒbƒg‚ª—§‚Á‚Ä‚¢‚é•”•ªW‡‚ğ—ñ‹“‚·‚é
+  // ãƒ“ãƒƒãƒˆãŒç«‹ã£ã¦ã„ã‚‹éƒ¨åˆ†é›†åˆã‚’åˆ—æŒ™ã™ã‚‹
   ulong_t const d = 0x7;
 
   ulong_t n = 0;

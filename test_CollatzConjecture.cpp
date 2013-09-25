@@ -1,4 +1,4 @@
-/**
+﻿/**
 ** コラッツ予想を試すプログラム
 ** 入力例)
 ** 5
@@ -63,8 +63,8 @@ int main()
 
   std::transform(data.begin(), data.end(), data.begin(), solver<>());
 
-	std::copy(data.begin(), data.end(),
-		std::ostream_iterator<int>(std::cout, "\n"));
+  std::copy(data.begin(), data.end(),
+    std::ostream_iterator<int>(std::cout, "\n"));
 
   return 0;
 }

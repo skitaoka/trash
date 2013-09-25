@@ -1,12 +1,12 @@
-///
-/// Binary Indexed Tree (Fenwick Tree) ‚É‚æ‚é—İÏ•p“x•\‚ÌÀ‘•.
+ï»¿///
+/// Binary Indexed Tree (Fenwick Tree) ã«ã‚ˆã‚‹ç´¯ç©é »åº¦è¡¨ã®å®Ÿè£….
 /// cf.  http://d.hatena.ne.jp/naoya/20090606/1244284915
 ///
 namespace cute
 {
 	namespace algorithm
 	{
-		// ƒf[ƒ^‚ğ“ñ•ª–Ø‚ÅŠÇ—‚µ‚ÄA‚»‚Ì”ÍˆÍ‚ÌŒvZ‚ğ‚µ‚½’l‚ğ•Û‚·‚éB
+		// ãƒ‡ãƒ¼ã‚¿ã‚’äºŒåˆ†æœ¨ã§ç®¡ç†ã—ã¦ã€ãã®ç¯„å›²ã®è¨ˆç®—ã‚’ã—ãŸå€¤ã‚’ä¿æŒã™ã‚‹ã€‚
 		template <typename T, std::size_t Sz, typename Op>
 		class binary_indexed_tree
 		{
@@ -22,7 +22,7 @@ namespace cute
 				T sum = 0;
 				while (idx) {
 					Op::apply(sum, data_[idx]);
-					idx -= idx & -idx; // ãˆÊƒrƒbƒg‚©‚ç‡‚É
+					idx -= idx & -idx; // ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰é †ã«
 				}
 				return sum;
 			}
@@ -33,12 +33,12 @@ namespace cute
 
 				while (idx <= Sz) {
 					Op::apply(data_[idx], val);
-					idx += idx & -idx; // ‰ºˆÊƒrƒbƒg‚©‚ç‡‚É
+					idx += idx & -idx; // ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰é †ã«
 				}
 			}
 
 		private:
-			// [0] ‚Íƒ_ƒ~[—v‘f
+			// [0] ã¯ãƒ€ãƒŸãƒ¼è¦ç´ 
 			std::array<T, Sz+1> data_;
 		};
 	}//end of namespace algorithm

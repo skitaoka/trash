@@ -1,4 +1,4 @@
-#define VC_EXTRALEAN 1
+ï»¿#define VC_EXTRALEAN 1
 #define NOMINMAX 1
 #define WIN32_LEAN_AND_MEAN 1
 #define _USE_MATH_DEFINES 1
@@ -20,7 +20,7 @@ int main()
 {
 	NCB ncb;
 
-	// NIC ”‚Ìæ“¾
+	// NIC æ•°ã®å–å¾—
 	LANA_ENUM ncbes;
 	std::memset(&ncb, 0, sizeof(ncb));
 	ncb.ncb_command = NCBENUM;
@@ -34,7 +34,7 @@ int main()
 
 	std::cout << "num_ncbes = " << static_cast<int>(ncbes.length) << std::endl;
 	for (int i = 0, size = ncbes.length; i < size; ++i) {
-		// NIC ‚ğƒŠƒZƒbƒg
+		// NIC ã‚’ãƒªã‚»ãƒƒãƒˆ
 		std::memset(&ncb, 0, sizeof(ncb));
 		ncb.ncb_command  = NCBRESET;
 		ncb.ncb_lana_num = ncbes.lana[i];
@@ -43,7 +43,7 @@ int main()
 			continue;
 		}
 		
-		// ƒAƒ_ƒvƒ^‚Ìó‘Ô‚ğæ“¾
+		// ã‚¢ãƒ€ãƒ—ã‚¿ã®çŠ¶æ…‹ã‚’å–å¾—
 		ADAPTER_STATUS  adapt;
 		std::memset(&ncb, 0, sizeof(ncb));
 		ncb.ncb_command  = NCBASTAT;

@@ -1,4 +1,4 @@
-//
+﻿//
 // nvcc -O2 -arch=sm_35 -Xcompiler "/wd4819 /MT" cudaEventTest.cu
 //
 #include <vector>

@@ -1,12 +1,12 @@
-//
-// —LˆÓ‚ÉŸ—¦‚ª‚‚­‚È‚Á‚½‚Æ”»’è‚Å‚«‚éŸ—˜‰ñ”‚ğs‰ñ”‚²‚Æ‚ÉŒvZ‚·‚éB
+ï»¿//
+// æœ‰æ„ã«å‹ç‡ãŒé«˜ããªã£ãŸã¨åˆ¤å®šã§ãã‚‹å‹åˆ©å›æ•°ã‚’è©¦è¡Œå›æ•°ã”ã¨ã«è¨ˆç®—ã™ã‚‹ã€‚
 //
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <vector>
 
-// —İæ
+// ç´¯ä¹—
 double power(double const x, int const n)
 {
   double retval = 1.0;
@@ -16,7 +16,7 @@ double power(double const x, int const n)
   return retval;
 }
 
-// ŠKæ
+// éšä¹—
 double fact(int const n)
 {
   double retval = 1.0;
@@ -26,7 +26,7 @@ double fact(int const n)
   return retval;
 }
 
-// —İæ/ŠKæ
+// ç´¯ä¹—/éšä¹—
 double power_by_fact(double const x, int const n)
 {
   if (n) {
@@ -40,7 +40,7 @@ double power_by_fact(double const x, int const n)
   }
 }
 
-// ‘g‡‚¹
+// çµ„åˆã›
 double combi(int const n, int const k)
 {
   double retval = 1.0;
@@ -50,7 +50,7 @@ double combi(int const n, int const k)
   return retval / fact(k);
 }
 
-// p=1/2 ‚Ì“ñ€•ª•z‚Ì—İÏŠÖ”
+// p=1/2 ã®äºŒé …åˆ†å¸ƒã®ç´¯ç©é–¢æ•°
 double binormal_cfd(int const n, int const k)
 {
   double retval = 0.0;
@@ -60,7 +60,7 @@ double binormal_cfd(int const n, int const k)
   return retval;
 }
 
-// p=1/2 ‚Ìƒ|ƒAƒ\ƒ“•ª•z‚Ì—İÏŠÖ”
+// p=1/2 ã®ãƒã‚¢ã‚½ãƒ³åˆ†å¸ƒã®ç´¯ç©é–¢æ•°
 double poisson_cfd(int const n, int const k)
 {
   double const lambda = n * 0.5;
@@ -75,29 +75,29 @@ double poisson_cfd(int const n, int const k)
 
 int main(int argc, char * argv[])
 {
-  // s‰ñ”
+  // è©¦è¡Œå›æ•°
   int const count[] = {1, 5, 7, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000,};
   int const size = static_cast<int>(sizeof(count) / sizeof(count[0]));
 
   double const p[] = {0.10, 0.05, 0.01,};
   int const num_pattern = static_cast<int>(sizeof(p) / sizeof(p[0]));
 
-  std::printf("s‰ñ”");
+  std::printf("è©¦è¡Œå›æ•°");
   for (int j = 0; j < num_pattern; ++j) {
     std::printf(", %g", p[j]);
   }
   std::printf("\n");
   for (int i = 0; i < size; ++i) {
-    // —LˆÓ‚ÉŸ—¦‚ª‚‚­‚È‚Á‚½‚Æ”»’è‚Å‚«‚éŸ—˜‰ñ”
+    // æœ‰æ„ã«å‹ç‡ãŒé«˜ããªã£ãŸã¨åˆ¤å®šã§ãã‚‹å‹åˆ©å›æ•°
     std::vector<int> nwon(num_pattern);
 
-    int const n = count[i]; // s‰ñ”
+    int const n = count[i]; // è©¦è¡Œå›æ•°
     for (int k = n/2; k <= n; ++k) {
 #if 0
-	  // “ñ€•ª•z‚ÅŒvZ
+	  // äºŒé …åˆ†å¸ƒã§è¨ˆç®—
       double const q = binormal_cfd(n, k);
 #else
-	  // ƒ|ƒAƒ\ƒ“•ª•z‚ÅŒvZ
+	  // ãƒã‚¢ã‚½ãƒ³åˆ†å¸ƒã§è¨ˆç®—
 	  double const q = poisson_cfd(n, k);
 #endif
       for (int j = 0; j < num_pattern; ++j) {

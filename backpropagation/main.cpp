@@ -1,6 +1,6 @@
-/*
- * ƒjƒ…[ƒ‰ƒ‹ƒlƒbƒgƒ[ƒN‚É‚æ‚éè‘‚«•¶š”F¯
- * iƒoƒbƒNƒvƒƒpƒQ[ƒVƒ‡ƒ“j
+ï»¿/*
+ * ãƒ‹ãƒ¥ãƒ¼ãƒ©ãƒ«ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã«ã‚ˆã‚‹æ‰‹æ›¸ãæ–‡å­—èªè­˜
+ * ï¼ˆãƒãƒƒã‚¯ãƒ—ãƒ­ãƒ‘ã‚²ãƒ¼ã‚·ãƒ§ãƒ³ï¼‰
  */
 
 #include "BackPropagation.hpp"
@@ -8,7 +8,7 @@
 
 int main( int argc, char* argv[] )
 {
-	// ŠwKƒf[ƒ^
+	// å­¦ç¿’ãƒ‡ãƒ¼ã‚¿
 	double learnData[][ 7 * 7 ] =
 	{
 		{ // (0)
@@ -103,7 +103,7 @@ int main( int argc, char* argv[] )
 		},
 	};
 
-	// “š‚¦
+	// ç­”ãˆ
 	double answer[][10] =
 	{
 		{ 1,0,0,0,0,0,0,0,0,0,}, // (0)
@@ -118,12 +118,12 @@ int main( int argc, char* argv[] )
 		{ 0,0,0,0,0,0,0,0,0,1,}, // (9)
 	};
 
-	// —”‚Ìí‚ğ“K“–‚É‰Šú‰»
+	// ä¹±æ•°ã®ç¨®ã‚’é©å½“ã«åˆæœŸåŒ–
 	srand( (long)time( NULL ) );
 
 	BackPropagation bp( 49, 49, 10 );
 
-	// ŠwK
+	// å­¦ç¿’
 	fprintf( stderr,"learn...\n" );
 	for ( int i = 0; ; ++i )
 	{
@@ -147,7 +147,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 
-	// ”»’è
+	// åˆ¤å®š
 	for ( int i = 0; i < 10; i++ )
 	{
 		bp.foward( learnData[i] );

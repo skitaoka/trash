@@ -1,4 +1,4 @@
-#include "BackPropagation.hpp"
+ï»¿#include "BackPropagation.hpp"
 
 BackPropagation::BackPropagation( int input, int hidden, int output )
 	: eta_( 0.3 )
@@ -90,10 +90,10 @@ BackPropagation::~BackPropagation()
 }
 
 
-//! “ü—Í‚ð—^‚¦‚ÄŒ‹‰Ê‚ð“¾‚é
+//! å…¥åŠ›ã‚’ä¸Žãˆã¦çµæžœã‚’å¾—ã‚‹
 void BackPropagation::foward( double* inputLayer )
 {
-	// “ü—Í‘w->’†ŠÔ‘w
+	// å…¥åŠ›å±¤->ä¸­é–“å±¤
 	for ( int j = 0; j <= hidden_; ++j )
 	{
 		double x = 0.0;
@@ -106,7 +106,7 @@ void BackPropagation::foward( double* inputLayer )
 		hiddenLayer_[j] = BackPropagation::sigmoid( x + wij_[j][input_] );
 	}
 
-	// ’†ŠÔ‘w->o—Í‘w
+	// ä¸­é–“å±¤->å‡ºåŠ›å±¤
 	for ( int k = 0; k < output_; ++k )
 	{
 		double x = 0.0;
@@ -122,7 +122,7 @@ void BackPropagation::foward( double* inputLayer )
 
 void BackPropagation::back( double* inputLayer, double* teach )
 {
-	// o—Í‘w->’†ŠÔ‘w
+	// å‡ºåŠ›å±¤->ä¸­é–“å±¤
 	for ( int k = 0; k < output_; ++k )
 	{
 		deltak_[k] = ( teach[k] - outputLayer_[k] ) *
@@ -138,7 +138,7 @@ void BackPropagation::back( double* inputLayer, double* teach )
 		}
 	}
 
-	// ’†ŠÔ‘w->“ü—Í‘w
+	// ä¸­é–“å±¤->å…¥åŠ›å±¤
 	for ( int j = 0; j <= hidden_; ++j )
 	{
 		double x = 0.0;
@@ -165,7 +165,7 @@ void BackPropagation::back( double* inputLayer, double* teach )
 }
 
 
-//! Œë·‚ð“¾‚é
+//! èª¤å·®ã‚’å¾—ã‚‹
 double BackPropagation::getError( double* teach )
 {
 	double error = 0;

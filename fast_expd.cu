@@ -1,31 +1,31 @@
-//
-// �����Ȕ{���x exp �̎���
+﻿//
+// 高速な倍精度 exp の実装
 //   cf. http://www.slideshare.net/herumi/exp-9499790
 //
-// ���茋�� (wall-clock time, N=1,000,000, GeForce GTX 680):
+// 測定結果 (wall-clock time, N=1,000,000, GeForce GTX 680):
 //   nvcc -O2 -m64 -arch=sm_30 -Xcompiler "/openmp /O2" fast_expd.cu
-//   �f�[�^���\�[�g�ς݂̏ꍇ (�e�[�u���Q�ƂŃL���b�V���Ƀq�b�g���₷��)
+//   データがソート済みの場合 (テーブル参照でキャッシュにヒットしやすい)
 //       exp   = 0.985646 ms
 //     __expf  = 0.192752 ms
 //      fexpdc = 0.332516 ms
 //      fexpdg = 0.335972 ms
 //       cpu   = 4.23478 ms
-//   �f�[�^���\�[�g����ĂȂ��ꍇ
+//   データがソートされてない場合
 //       exp   = 0.708805 ms
 //     __expf  = 0.205807 ms
 //      fexpdc = 0.676168 ms
 //      fexpdg = 0.491863 ms
 //       cpu   = 4.2966 ms
 //
-// ���茋�� (wall-clock time, N=1,000,000, Tesla K20c):
+// 測定結果 (wall-clock time, N=1,000,000, Tesla K20c):
 //   nvcc -O2 -m64 -arch=sm_35 -Xcompiler "/openmp /O2" fast_expd.cu
-//   �f�[�^���\�[�g�ς݂̏ꍇ (�e�[�u���Q�ƂŃL���b�V���Ƀq�b�g���₷��)
+//   データがソート済みの場合 (テーブル参照でキャッシュにヒットしやすい)
 //       exp   = 0.118695 ms
 //     __expf  = 0.094613 ms
 //      fexpdc = 0.096657 ms
 //      fexpdg = 0.113040 ms
 //       cpu   = 5.612460 ms
-//   �f�[�^���\�[�g����ĂȂ��ꍇ
+//   データがソートされてない場合
 //       exp   = 0.119024 ms
 //     __expf  = 0.094577 ms
 //      fexpdc = 0.562242 ms

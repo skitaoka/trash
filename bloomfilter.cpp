@@ -1,4 +1,4 @@
-#include <vector>
+ï»¿#include <vector>
 #include <iostream>
 
 typedef std::size_t (*hash_function)( char const * );
@@ -105,9 +105,9 @@ int main( int argc, char * argv[] )
 	}
 
 	//
-	// m/n = 8, k = 2 ‚È‚Ì‚Å•\(*)‚©‚ç‹[—z«—¦‚Í 0.0489
+	// m/n = 8, k = 2 ãªã®ã§è¡¨(*)ã‹ã‚‰æ“¬é™½æ€§ç‡ã¯ 0.0489
 	//
-	// ‹[—z«: ‘¶İ‚µ‚È‚¢‚Ì‚É‚ ‚é‚Æ”»’è‚³‚ê‚é‚±‚Æ
+	// æ“¬é™½æ€§: å­˜åœ¨ã—ãªã„ã®ã«ã‚ã‚‹ã¨åˆ¤å®šã•ã‚Œã‚‹ã“ã¨
 	// (*) false_positive_rate.xml
 	//
 

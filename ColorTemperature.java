@@ -1,6 +1,6 @@
-
+Ôªø
 final class ColorTemperature {
-  // 360-830[nm](1[nm]çèÇ›)
+  // 360-830[nm](1[nm]Âàª„Åø)
   private static final int CIX1964_10deg_XYZ_CMF_N = 830 - 360 + 1;
 
   private static final double[] CIX1964_10deg_XYZ_CMF_X =
@@ -308,9 +308,9 @@ final class ColorTemperature {
   public static void main(String[] args) {
     System.out.println("<html><body bgcolor=black>"
       + "<table width=100% align=center hspace=0 vspace=0 border=0>"
-      + "<caption><font color=white>êFâ∑ìxï\</font></caption>"
+      + "<caption><font color=white>Ëâ≤Ê∏©Â∫¶Ë°®</font></caption>"
       + "<tr align=center>"
-      + "<th><font color=white>â∑ìx [K]</font></th>"
+      + "<th><font color=white>Ê∏©Â∫¶ [K]</font></th>"
       + "<th><font color=white>R</font></th>"
       + "<th><font color=white>G</font></th>"
       + "<th><font color=white>B</font></tr>");
@@ -320,7 +320,7 @@ final class ColorTemperature {
       double Z = 0;
 
       for (int j = 0; j < CIX1964_10deg_XYZ_CMF_N; ++j) {
-        final double lambda = (360 + j) * 1e-9; // îgí∑ [m]
+        final double lambda = (360 + j) * 1e-9; // Ê≥¢Èï∑ [m]
         final double spd = findBlackBodyRadiance(lambda, temperature);
 
         X += spd * CIX1964_10deg_XYZ_CMF_X[j];
@@ -357,20 +357,20 @@ final class ColorTemperature {
   }
 
   /**
-   * ÉvÉâÉìÉNÇÃñ@ë•Ç…äÓÇ√Ç¢ÇƒçïëÃÇÃï™åıï˙éÀãPìxÇãÅÇﬂÇÈ.
+   * „Éó„É©„É≥„ÇØ„ÅÆÊ≥ïÂâá„Å´Âü∫„Å•„ÅÑ„Å¶Èªí‰Ωì„ÅÆÂàÜÂÖâÊîæÂ∞ÑËºùÂ∫¶„ÇíÊ±Ç„ÇÅ„Çã.
    * cf. http://ja.wikipedia.org/wiki/%E9%BB%92%E4%BD%93
    * cf. http://ja.wikipedia.org/wiki/%E3%83%97%E3%83%A9%E3%83%B3%E3%82%AF%E3%81%AE%E6%B3%95%E5%89%87
    *
    * I(lambda, T) = 2 h c^2 / (lambda^5 (exp(h c / (lambda k T)) - 1))
    *
-   *   lambda: îgí∑           [m]
-   *   T     : â∑ìx           [K]
-   *   h     : ÉvÉâÉìÉNíËêî   6.62606896e-34 [J.s]
-   *   c     : åıë¨ìx         2.99792458e+8  [m/s]
-   *   k     : É{ÉãÉcÉ}ÉìíËêî 1.38065030e-23 [J/K]
+   *   lambda: Ê≥¢Èï∑           [m]
+   *   T     : Ê∏©Â∫¶           [K]
+   *   h     : „Éó„É©„É≥„ÇØÂÆöÊï∞   6.62606896e-34 [J.s]
+   *   c     : ÂÖâÈÄüÂ∫¶         2.99792458e+8  [m/s]
+   *   k     : „Éú„É´„ÉÑ„Éû„É≥ÂÆöÊï∞ 1.38065030e-23 [J/K]
    *
-   * @param lambda îgí∑ [m]
-   * @param t      â∑ìx [K]
+   * @param lambda Ê≥¢Èï∑ [m]
+   * @param t      Ê∏©Â∫¶ [K]
    */
   private static double findBlackBodyRadiance(final double lambda, final double temperature) {
     final double lambda5 = lambda * lambda * lambda * lambda * lambda;
