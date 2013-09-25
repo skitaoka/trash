@@ -1,0 +1,19 @@
+﻿@charset 'UTF-8';
+
+body {
+  font-family: Verdana, 'メイリオ', san-serif;
+  /* san-serif=ゴシック体, serif=明朝体, monospace=固定幅, fantasy=装飾系, cursive=手書き風 */
+}
+
+a {
+  font-family: Arial;
+}
+a:hover{
+  color: #1111cc;
+}
+a:link {
+  color: #1111cc;
+}
+a:visited {
+  color: #0044cc;
+}
