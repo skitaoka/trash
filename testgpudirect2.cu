@@ -1,3 +1,4 @@
+//
 // Peer 間のメモリ転送速度を測る。
 //
 // nvcc -O2 -arch=sm_35 –Xcompiler "–fopenmp" testgpudirect2.cu
@@ -32,7 +33,8 @@ int main(int argc, char * argv[])
     std::fprintf(stderr, "(%d-%d) cannot access peer.\n", gpu_from, gpu_to);
     return 1;
   }
-  //_check(::cudaDeviceEnablePeerAccess(gpu_to, gpu_from));
+  // GPUDirect による転送を許可する
+  _check(::cudaDeviceEnablePeerAccess(gpu_to, gpu_from));
 
   char * data0 = NULL; // GPU 0 上のメモリ
   char * data1 = NULL; // GPU 1 上のメモリ
