@@ -40,8 +40,8 @@ void encode(std::ostream & out, normalmap const & map)
       }
 
       out
-        >> min_x >> max_x
-        >> min_y >> max_y;
+        << min_x << max_x
+        << min_y << max_y;
 
       // 8bitへ量子化
       float const range_x_inv = ((1<<8)-1) / (max_x - min_x);
