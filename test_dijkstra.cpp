@@ -12,6 +12,7 @@ std::vector<unsigned>
     std::vector<std::vector<unsigned_pair>> const & adj,
     unsigned const s, unsigned const t)
 {
+  // (s からの最短距離, 最短経路上の 1 つ前のノード)
   std::vector<unsigned_pair>
     path(adj.size(),
          std::make_pair(
@@ -58,6 +59,7 @@ std::vector<unsigned>
 
 int main()
 {
+  // (隣接ノードのID, 隣接ノードまでの距離)
   std::vector<std::vector<unsigned_pair>> adj(3);
 
   adj[0].push_back(std::make_pair(1U, 3U));
