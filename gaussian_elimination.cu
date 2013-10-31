@@ -1,7 +1,7 @@
 //
 // modified Gaussian elimination method:
-//  > nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
-//  > nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/Qpar /Qpar-report:1 /Qvec-report:1 /wd4819" gaussian_elimination.cu
+//  > nvcc -O2 -arch=sm_30 -DROW_COLUMN -m64 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
+//  > nvcc -O2 -arch=sm_30 -DROW_COLUMN -m64 -Xcompiler "/Qpar /Qpar-report:1 /Qvec-report:1 /wd4819" gaussian_elimination.cu
 //
 #include <random>
 #include <vector>
@@ -20,7 +20,11 @@ namespace {
   __host__ __device__ __forceinline __forceinline__
     int idx(int const i, int const j, int const n)
   {
+#ifdef ROW_COLUMN
+    return i*(n+1)+j;
+#else
     return j*n+i;
+#endif
   }
 
   __host__ void __forceinline __forceinline__
@@ -32,7 +36,7 @@ namespace {
     }
   }
 
-#if 0
+#ifdef SHOW
   // Mathematica フォーマットで解ベクトルを表示する.
   void show_source_vector(std::vector<double> const & a, int const n)
   {
@@ -81,6 +85,38 @@ namespace {
 #endif
 }
 
+#ifdef ROW_COLUMN
+// 修正ガウス消去法で対角化しつつ解を計算していく.
+__global__ void
+  kernel_do_gaussian_elimination(
+    double * __restrict__ const a,
+    int                   const n,
+    int                   const i)
+{
+	int const tid = threadIdx.x & 31; // thread id in the warp
+	int const stride = blockDim.x * gridDim.x >> 5;
+  for (int j = (threadIdx.x + blockIdx.x * blockDim.x) >> 5; j < n; j += stride) {
+    if (j != i) {
+      double const _aji = -a[idx(j,i,n)] / a[idx(i,i,n)];
+      for (int k = i+1+tid; k <= n; k += 32) { // NOTE: k = i は計算不用なので省略している.
+        int const jk = idx(j,k,n);
+        a[jk] = normalize_number(a[jk] + a[idx(i,k,n)] * _aji);
+      }
+    }
+  }
+}
+// 行列の対角要素でベクトルをスケーリングして解を求める.
+__global__ void
+  kernel_diagonal_scaling(
+    double * __restrict__ const a,
+    int                   const n)
+{
+	int const stride = blockDim.x * gridDim.x;
+  for (int i = threadIdx.x + blockIdx.x * blockDim.x; i < n; i += stride) {
+    a[idx(i,n,n)] /= a[idx(i,i,n)];
+  }
+}
+#else
 // 修正ガウス消去法で対角化しつつ解を計算していく.
 __global__ void
   kernel_do_gaussian_elimination(
@@ -97,7 +133,6 @@ __global__ void
     }
   }
 }
-
 // 行列の対角要素でベクトルをスケーリングして解を求める.
 __global__ void
   kernel_diagonal_scaling(
@@ -109,6 +144,8 @@ __global__ void
     a[idx(i,n,n)] /= a[idx(i,i,n)];
   }
 }
+#endif
+
 
 // カーネルを起動する (Dynamic Parallelism を利用するともっと簡単に書ける)
 __host__ void
@@ -117,8 +154,19 @@ __host__ void
   cudaStream_t stream;
   _check(::cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
-  int const num_threads = 1024;
+#ifdef ROW_COLUMN
+  int num_multiprocessors = 0;
+  ::cudaDeviceGetAttribute(&num_multiprocessors, cudaDevAttrMultiProcessorCount, 0);
+  int const num_threads = 192 * 2;
+  int const num_blocks  = 24 * 192 * num_multiprocessors * 4 / (3 * num_threads);
+
+  std::cout << ": warps: " << num_threads * num_blocks << std::endl;
+#else
+  int const num_threads = 192 * 5;
   int const num_blocks  = (n+num_threads-1)/num_threads;
+
+  std::cout << ": naive: " << num_threads * num_blocks << std::endl;
+#endif
 
   for (int i = 0; i < n; ++i) {
     kernel_do_gaussian_elimination
@@ -203,7 +251,9 @@ int main(int argc, char * argv[])
       hab[idx(i,i,n)] = -sum;
     }
   }
-  //show_linear_system(hab, n);
+#ifdef SHOW
+  show_linear_system(hab, n);
+#endif
 
   if (d >= 0) {
     std::cout << "> init a device.\n";
@@ -246,7 +296,9 @@ int main(int argc, char * argv[])
     auto const elapsed_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     std::cout << "> done. " << elapsed_time_ms << " ms \n";
   }
-  //show_source_vector(hab, n);
+#ifdef SHOW
+  show_source_vector(hab, n);
+#endif
 
   return 0;
 }
