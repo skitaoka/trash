@@ -84,9 +84,9 @@ namespace {
 // 修正ガウス消去法で対角化しつつ解を計算していく.
 __global__ void
   kernel_do_gaussian_elimination(
-    double * const a,
-    int      const n,
-    int      const i)
+    double * __restrict__ const a,
+    int                   const n,
+    int                   const i)
 {
   int const j = threadIdx.x + blockIdx.x * blockDim.x;
   if ((j < n) && (j != i)) {
@@ -101,8 +101,8 @@ __global__ void
 // 行列の対角要素でベクトルをスケーリングして解を求める.
 __global__ void
   kernel_diagonal_scaling(
-    double * const a,
-    int      const n)
+    double * __restrict__ const a,
+    int                   const n)
 {
   int const i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < n) {
