@@ -1,7 +1,7 @@
 //
-// nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
-//
-// nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/Qpar /Qpar-report:1 /Qvec-report:1 /wd4819" gaussian_elimination.cu
+// modified Gaussian elimination method:
+//  > nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
+//  > nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/Qpar /Qpar-report:1 /Qvec-report:1 /wd4819" gaussian_elimination.cu
 //
 #include <random>
 #include <vector>
@@ -81,7 +81,7 @@ namespace {
 #endif
 }
 
-// 拡張ガウス消去法で対角化しつつ解を計算していく.
+// 修正ガウス消去法で対角化しつつ解を計算していく.
 __global__ void
   kernel_do_gaussian_elimination(
     double * const a,
@@ -133,7 +133,7 @@ __host__ void
   _check(::cudaStreamDestroy(stream));
 }
 
-// 拡張ガウス消去法の CPU 実装 (デバッグ用)
+// 修正ガウス消去法の CPU 実装 (デバッグ用)
 void do_gaussian_elimination(std::vector<double> & a, int const n)
 {
   for (int i = 0; i < n; ++i) {
