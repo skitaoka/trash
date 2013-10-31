@@ -1,5 +1,7 @@
 //
-// nvcc -O2 -arch=sm_30 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
+// nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/openmp /wd4819" gaussian_elimination.cu
+//
+// nvcc -O2 -arch=sm_30 -m64 -Xcompiler "/Qpar /Qpar-report:1 /Qvec-report:1 /wd4819" gaussian_elimination.cu
 //
 #include <random>
 #include <vector>
@@ -30,6 +32,7 @@ namespace {
     }
   }
 
+#if 0
   // Mathematica フォーマットで解ベクトルを表示する.
   void show_source_vector(std::vector<double> const & a, int const n)
   {
@@ -75,6 +78,7 @@ namespace {
     }
     std::cout << '\n';
   }
+#endif
 }
 
 // 拡張ガウス消去法で対角化しつつ解を計算していく.
@@ -136,12 +140,17 @@ void do_gaussian_elimination(std::vector<double> & a, int const n)
     //display_linear_system(a, n);
 
     double const _aii = -1.0 / a[idx(i,i,n)];
-#ifndef _OPENMP
+
+#ifdef _OPENMP
 #pragma omp parallel for
+#else
+#pragma loop(hint_parallel(16))
+#pragma loop(ivdep)
 #endif
     for (int j = 0; j < n; ++j) {
       if (j != i) {
         double const _aji = a[idx(j,i,n)] * _aii;
+
         for (int k = i+1; k <= n; ++k) {
           int const jk = idx(j,k,n);
           a[jk] = normalize_number(a[jk] + a[idx(i,k,n)] * _aji);
@@ -149,8 +158,11 @@ void do_gaussian_elimination(std::vector<double> & a, int const n)
       }
     }
   }
-#ifndef _OPENMP
+#ifdef _OPENMP
 #pragma omp parallel for
+#else
+#pragma loop(hint_parallel(16))
+#pragma loop(ivdep)
 #endif
   for (int i = 0; i < n; ++i) {
     a[idx(i,n,n)] /= a[idx(i,i,n)];
@@ -175,9 +187,10 @@ int main(int argc, char * argv[])
   std::cout << "> init data.\n";
   std::vector<double> hab(n * (n+1));
   {
-    std::random_device rd;
-  	std::mt19937 mt(rd());
-  	std::uniform_real_distribution<double> u;
+    //std::random_device rd;
+    //std::mt19937 mt(rd());
+    std::mt19937 mt(n);
+    std::uniform_real_distribution<double> u;
 
     for (int i = 0; i < n; ++i) {
       double sum = 0.0;
