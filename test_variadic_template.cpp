@@ -3,48 +3,47 @@
 //
 #include <iostream>
 
-template <int N, typename ...Ts>
+template <typename ...Ts>
 struct my_tuple_data;
     
-template <int N>
-struct my_tuple_data<N>
+template <>
+struct my_tuple_data<>
 {
 };
 
-template <int N, typename Head, typename ...Body>
-struct my_tuple_data<N, Head, Body...>: public my_tuple_data<N+1, Body...>
+template <typename Head, typename ...Body>
+struct my_tuple_data<Head, Body...>: public my_tuple_data<Body...>
 {
     Head value;
 };
 
 template <typename ...Ts>
-struct my_tuple: public my_tuple_data<0, Ts...>
+struct my_tuple: public my_tuple_data<Ts...>
 {
 };
 
-template <int N, typename Head, typename ...Body>
+template <int I, typename Head, typename ...Body>
 struct my_tuple_type
 {
-    typedef typename my_tuple_type<N-1, Body...>::value_type value_type;
-    typedef typename my_tuple_type<N-1, Body...>::tuple_type tuple_type;
+    typedef typename my_tuple_type<I-1, Body...>::value_type value_type;
+    typedef typename my_tuple_type<I-1, Body...>::tuple_type tuple_type;
 };
 
 template <typename Head, typename ...Body>
 struct my_tuple_type<0, Head, Body...>
 {
-    typedef Head                            value_type;
-    typedef my_tuple_data<0, Head, Body...> tuple_type;
+    typedef Head                         value_type;
+    typedef my_tuple_data<Head, Body...> tuple_type;
 };
 
 
-template <int N, typename ...Ts> inline
+template <int N, typename ...Ts>
 typename my_tuple_type<N, Ts...>::value_type &
     get(my_tuple<Ts...>& t)
 {
-  typedef typename my_tuple_type<N, Ts...>::tuple_type & tuple_type;
-  return ((tuple_type&) t).value;
+  typedef typename my_tuple_type<N, Ts...>::tuple_type tuple_type;
+  return static_cast<tuple_type&>(t).value;
 }
-
 
 int main()
 {
