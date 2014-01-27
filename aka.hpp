@@ -387,15 +387,15 @@ namespace aka {
 #if 0
 		aka::matrix3<T> c;
 		aka::outer(aka::matrix3<T>(
-			((*s)[0] > T()) ? aka::rcp((*s)[0]) : T(),
-			((*s)[1] > T()) ? aka::rcp((*s)[1]) : T(),
-			((*s)[2] > T()) ? aka::rcp((*s)[2]) : T()), *u, &c);
+			((*s)[0] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[0]) : T(),
+			((*s)[1] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[1]) : T(),
+			((*s)[2] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[2]) : T()), *u, &c);
 		aka::mul(c, a, vt);
 #else
 		aka::inner(*u, a, vt);
-		{ T const r = ((*s)[0] > T()) ? aka::rcp((*s)[0]) : T(); (*vt)(0,0) *= r; (*vt)(0,1) *= r; (*vt)(0,2) *= r; }
-		{ T const r = ((*s)[1] > T()) ? aka::rcp((*s)[1]) : T(); (*vt)(1,0) *= r; (*vt)(1,1) *= r; (*vt)(1,2) *= r; }
-		{ T const r = ((*s)[2] > T()) ? aka::rcp((*s)[2]) : T(); (*vt)(2,0) *= r; (*vt)(2,1) *= r; (*vt)(2,2) *= r; }
+		{ T const r = ((*s)[0] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[0]) : T(); (*vt)(0,0) *= r; (*vt)(0,1) *= r; (*vt)(0,2) *= r; }
+		{ T const r = ((*s)[1] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[1]) : T(); (*vt)(1,0) *= r; (*vt)(1,1) *= r; (*vt)(1,2) *= r; }
+		{ T const r = ((*s)[2] > std::numeric_limits<T>::epsilon()) ? aka::rcp((*s)[2]) : T(); (*vt)(2,0) *= r; (*vt)(2,1) *= r; (*vt)(2,2) *= r; }
 #endif
 	}
 }
