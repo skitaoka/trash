@@ -56,7 +56,7 @@ namespace aka
 
 			for (std::size_t k = 0, size = x.size(); k < size; ++k) {
 				for (std::size_t i = 0; i < n_; ++i) {
-					x_noized[i] = dist(engine) ? 0.0 : x[k][i];
+					x_noized[i] = dist(engine) ? T(1) - x[k][i] : x[k][i];
 				}
 
 				for (std::size_t j = 0; j < m_; ++j) {
