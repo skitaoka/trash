@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
   std::size_t const epoch = 1;
   std::size_t const num_samples = 100;
 
-  // 教師データ
+  // 謨吝ｸｫ繝�繝ｼ繧ｿ
   std::vector<std::vector<double>> x(num_samples);
   std::vector<int> t(num_samples); // [-1, 1]
 
-  double const C = 1.0; // パラメータ
+  double const C = 1.0; // 繝代Λ繝｡繝ｼ繧ｿ
   std::vector<double> w;
   for (std::size_t n = 0; n < epoch; ++n) {
     for (std::size_t i = 0, size = x.size(); i < size; ++i) {

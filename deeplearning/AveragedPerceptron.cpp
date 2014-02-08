@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
   std::size_t const epoch = 1;
   std::size_t const num_samples = 100;
 
-  // ‹³Žtƒf[ƒ^
+  // æ•™å¸«ãƒ‡ãƒ¼ã‚¿
   std::vector<std::vector<double>> x(num_samples);
   std::vector<int> t(num_samples); // [-1, 1]
 
-  double const alpha = 0.1; // ƒXƒeƒbƒv•
+  double const alpha = 0.1; // ã‚¹ãƒ†ãƒƒãƒ—å¹…
   std::vector<double> w;
   std::vector<double> w_avg;
   for (std::size_t n = 0; n < epoch; ++n) {

@@ -37,13 +37,13 @@ int main(int argc, char* argv[])
   std::size_t const epoch = 1;
   std::size_t const num_samples = 100;
 
-  // ‹³tƒf[ƒ^
+  // æ•™å¸«ãƒ‡ãƒ¼ã‚¿
   std::vector<std::vector<double>> x(num_samples);
   std::vector<int> t(num_samples); // [-1, 1]
 
-  double const r = 1.0; // ƒpƒ‰ƒ[ƒ^
-  std::vector<double> u; // •½‹Ï
-  std::vector<double> v; // •ªU
+  double const r = 1.0; // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  std::vector<double> u; // å¹³å‡
+  std::vector<double> v; // åˆ†æ•£
   for (std::size_t n = 0; n < epoch; ++n) {
     for (std::size_t i = 0, size = x.size(); i < size; ++i) {
       double const m = t[i] * aka::inner_product(u, x[i]); // margin
