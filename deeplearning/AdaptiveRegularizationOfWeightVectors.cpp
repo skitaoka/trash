@@ -1,36 +1,4 @@
-#include <algorithm>
-#include <vector>
-#include <numeric>
-
-namespace aka
-{
-  template <typename T>
-  inline T inner_product(std::vector<T> const & a, std::vector<T> const & b)
-  {
-    return std::inner_product(a.begin(), a.end(), b.begin(), T());
-  }
-
-  template <typename T>
-  inline T quadratic_form(std::vector<T> const & a, std::vector<T> const & x)
-  {
-    return std::inner_product(a.begin(), a.end(), x.begin(), T(), std::plus<T>(),
-      [](T const a, T const x) { return a * x * x; });
-  }
-
-  template <typename T, typename Fn>
-  inline void transform(std::vector<T> & a, std::vector<T> const & b, Fn fn)
-  {
-    std::transform(a.begin(), a.end(), b.begin(), fn);
-  }
-
-  template <typename T, typename Fn>
-  inline void transform(std::vector<T> & a, std::vector<T> const & b, std::vector<T> const & c, Fn fn)
-  {
-    for (std::size_t i = 0, size = a.size(); i < size; ++i) {
-      a[i] = fn(a[i], b[i], c[i]);
-    }
-  }
-}
+#include "OnlineLearning.hpp"
 
 int main(int argc, char* argv[])
 {

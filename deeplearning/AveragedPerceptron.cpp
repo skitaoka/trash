@@ -1,21 +1,4 @@
-#include <algorithm>
-#include <vector>
-#include <numeric>
-
-namespace aka
-{
-  template <typename T>
-  inline T inner_product(std::vector<T> const & a, std::vector<T> const & b)
-  {
-    return std::inner_product(a.begin(), a.end(), b.begin(), T());
-  }
-
-  template <typename T, typename Fn>
-  inline void transform(std::vector<T> & a, std::vector<T> const & b, Fn fn)
-  {
-    std::transform(a.begin(), a.end(), b.begin(), fn);
-  }
-}
+#include "OnlineLearning.hpp"
 
 int main(int argc, char* argv[])
 {
