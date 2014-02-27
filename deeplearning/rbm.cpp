@@ -109,16 +109,16 @@ double sigmoid(double const x)
 可視層と隠れ層のあいだにリンクがある構造で、可視層間や隠れ層間にはリンクがない構造にする。
 つまり P(h|v) = PI_j P(h_j|v) として h_i が独立になるモデルにする。
 具体的には、
-	P(v_i=1|h) = sigmoid(SUM_j w_ij h_j)	... (1)
-	P(h_j=1|v) = sigmoid(SUM_i w_ij v_i)	... (2)
-	sigmoid(x) = 1/{1+exp(-x)}
+  P(v_i=1|h) = sigmoid(SUM_j w_ij h_j)	... (1)
+  P(h_j=1|v) = sigmoid(SUM_i w_ij v_i)	... (2)
+  sigmoid(x) = 1/{1+exp(-x)}
 とする。
 
 モデルを
-	p(v) = SUM_h p(v,h)
-	p(v,h) = exp(-E(v,h))/Z
-	E(v,h) = - SUM_i SUM_j v_i w_ij h_j
-	Z = SUM_v SUM_h exp{-E(v,h)}
+  p(v) = SUM_h p(v,h)
+  p(v,h) = exp(-E(v,h))/Z
+  E(v,h) = - SUM_i SUM_j v_i w_ij h_j
+  Z = SUM_v SUM_h exp{-E(v,h)}
 とする。
 
 可視ベクトルの集合 V={v^1..v^n} が与えられている条件で、
@@ -126,41 +126,41 @@ double sigmoid(double const x)
 重み行列 W={w_ij} を学習する。
 
 最尤推定する。
-	argmax_{W,b,c} PI_v p(v)
+  argmax_{W,b,c} PI_v p(v)
 対数尤度を最大化する問題に書きかえる。
-	argmax_{W,b,c} SIGMA_v log(p(v))    ... (3)
+  argmax_{W,b,c} SIGMA_v log(p(v))    ... (3)
 ここで、あたえられた入力の集合が確率分布
-	q(v) = 1/n SIGMA_k delta(v-v^k) に
+  q(v) = 1/n SIGMA_k delta(v-v^k) に
 に従っている考えられるので eq.3 は期待値計算をしていることになる。
 そこで、
-	argmax_{W,b,c} <log(p(v))>_q(v)
+  argmax_{W,b,c} <log(p(v))>_q(v)
 と書きかえる。
-	J = <log(p(v))>_q(v)
+  J = <log(p(v))>_q(v)
 とおいて、式変形すると、
-	  = <log[SUM_h p(v,h)]>_q(v)
-	  = <log[SUM_h exp{-E(v,h)}/Z]>_q(v)
-	  = <log[SUM_h exp{-E(v,h)}] - log(Z)>_q(v)
-	  = <log[SUM_h exp{-E(v,h)}]>_q(v) - log(Z)
+    = <log[SUM_h p(v,h)]>_q(v)
+    = <log[SUM_h exp{-E(v,h)}/Z]>_q(v)
+    = <log[SUM_h exp{-E(v,h)}] - log(Z)>_q(v)
+    = <log[SUM_h exp{-E(v,h)}]>_q(v) - log(Z)
 となる。こいつの勾配を求める。
-	dJ/w_ij = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v) - log(Z)]
-	        = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] - 1/Z dZ/dw_ij
-	        = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + 1/Z d/dw_ij[SUM_v SUM_h dE(v,h)/dw_ij exp{-E(v,h)}]    ... Z = SUM_v SUM_h exp{-E(v,h)}
-	        = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + SUM_v SUM_h dE(v,h)/dw_ij p(v,h)                       ... p(v,h) = exp{-E(v,h)} / Z
-	        = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + <dE(v,h)/dw_ij>_p(v,h)
-	        = -<[SUM_h dE(v,h)/dw_ij exp{-E(v,h)}]/[SUM_h exp{-E(v,h)}]>_q(v) + <dE(v,h)/dw_ij>_p(v,h)
-	        = -<SUM_h dE(v,h)/dw_ij p(h|v)>_q(v) + <dE(v,h)/dw_ij>_p(v,h)                                       ... p(h|v) = exp{-E(v,h)} / [SUM_h exp{-E(v,h)}]
-	        = -<dE(v,h)/dw_ij>_p(h|v)q(v) + <dE(v,h)/dw_ij>_p(v,h)
-	        = <v_i h_j>_p(h|v)q(v) - <v_i h_j>_p(v,h)
+  dJ/w_ij = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v) - log(Z)]
+          = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] - 1/Z dZ/dw_ij
+          = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + 1/Z d/dw_ij[SUM_v SUM_h dE(v,h)/dw_ij exp{-E(v,h)}]    ... Z = SUM_v SUM_h exp{-E(v,h)}
+          = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + SUM_v SUM_h dE(v,h)/dw_ij p(v,h)                       ... p(v,h) = exp{-E(v,h)} / Z
+          = d/dw_ij [<log[SUM_h exp{-E(v,h)}]>_q(v)] + <dE(v,h)/dw_ij>_p(v,h)
+          = -<[SUM_h dE(v,h)/dw_ij exp{-E(v,h)}]/[SUM_h exp{-E(v,h)}]>_q(v) + <dE(v,h)/dw_ij>_p(v,h)
+          = -<SUM_h dE(v,h)/dw_ij p(h|v)>_q(v) + <dE(v,h)/dw_ij>_p(v,h)                                       ... p(h|v) = exp{-E(v,h)} / [SUM_h exp{-E(v,h)}]
+          = -<dE(v,h)/dw_ij>_p(h|v)q(v) + <dE(v,h)/dw_ij>_p(v,h)
+          = <v_i h_j>_p(h|v)q(v) - <v_i h_j>_p(v,h)
 
 p(h|v)q(v) と p(v,h) から、それぞれサンプリングして勾配を求める。
 
 p(h|v)q(v) からのサンプリング(直接計算できる): positive gradient
-	eq.2 で {v^1...v^n} から {h^1...h^n} を計算する。
-	<v_i h_j>_p(h|v)q(v) = 1/n SUM_k v_i^k h_j^k とする。
+  eq.2 で {v^1...v^n} から {h^1...h^n} を計算する。
+  <v_i h_j>_p(h|v)q(v) = 1/n SUM_k v_i^k h_j^k とする。
 
 p(v,h) からのサンプリング: negative gradient
-	p(h|v)q(v) から Gibbs sampling する。
-	eq.1 で {h^1...h^n} から {x^1...x^n} を計算する(ここが Gibbs sampling)。
-	eq.2 で {x^1...x^n} から {y^1...y^n} を計算する(直接計算)。
-	<v_i h_j>_p(v,h) = 1/n SUM_k x_i^k y_j^k とする。
+  p(h|v)q(v) から Gibbs sampling する。
+  eq.1 で {h^1...h^n} から {x^1...x^n} を計算する(ここが Gibbs sampling)。
+  eq.2 で {x^1...x^n} から {y^1...y^n} を計算する(直接計算)。
+  <v_i h_j>_p(v,h) = 1/n SUM_k x_i^k y_j^k とする。
 */

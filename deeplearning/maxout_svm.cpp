@@ -106,7 +106,7 @@ namespace aka
 				{
 					std::size_t const idx = (i*d+k)*(m+1)+m;
 					double const w_old = weights_[idx];
-					double const w_new =        (w_old - alpha_delta); // Ø•Ğ‚Í³‘¥‰»‚µ‚È‚¢
+					double const w_new =        (w_old - alpha_delta); // åˆ‡ç‰‡ã¯æ­£å‰‡åŒ–ã—ãªã„
 					weights_[idx] = (c * w_old + w_new) / (c+1);
 				}
 			}
@@ -116,15 +116,15 @@ namespace aka
 		std::vector<T> const & deltaIs() const { return deltaIs_; }
 
 	private:
-		std::size_t const m_; // “ü—Í‚ÌŸŒ³
-		std::size_t const d_; // “à•”‚ÌŸ”
-		std::size_t const n_; // o—Í‚ÌŸŒ³
+		std::size_t const m_; // å…¥åŠ›ã®æ¬¡å…ƒ
+		std::size_t const d_; // å†…éƒ¨ã®æ¬¡æ•°
+		std::size_t const n_; // å‡ºåŠ›ã®æ¬¡å…ƒ
 
-		std::vector<T>           weights_; // d‚İ
-		std::vector<T>           outputs_; // o—Í’l
-		std::vector<std::size_t> indices_; // —LŒø‚ÈƒCƒ“ƒfƒbƒNƒX
-		std::vector<std::size_t> counts_ ; // XV‰ñ”
-		std::vector<T>           deltaIs_; // Œë·ŠÖ”‚ğ‚±‚ÌƒŒƒCƒ„[‚ÌŠÖ”‚Å”÷•ª‚µ‚½’l
+		std::vector<T>           weights_; // é‡ã¿
+		std::vector<T>           outputs_; // å‡ºåŠ›å€¤
+		std::vector<std::size_t> indices_; // æœ‰åŠ¹ãªã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+		std::vector<std::size_t> counts_ ; // æ›´æ–°å›æ•°
+		std::vector<T>           deltaIs_; // èª¤å·®é–¢æ•°ã‚’ã“ã®ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®é–¢æ•°ã§å¾®åˆ†ã—ãŸå€¤
 	};
 }
 
@@ -203,7 +203,7 @@ namespace aka
 				}
 				{
 					T const w_old = w_[n];
-					T const w_new =        (w_old + alpha * t); // Ø•Ğ‚Í³‘¥‰»‚µ‚È‚¢
+					T const w_new =        (w_old + alpha * t); // åˆ‡ç‰‡ã¯æ­£å‰‡åŒ–ã—ãªã„
 					w_[n] = (c * w_old + w_new) / (c+1);
 				}
 			}
@@ -212,7 +212,7 @@ namespace aka
 	private:
 		std::vector<std::vector<T>> v_; // support vectors
 		std::vector<T>              w_; // weights
-		std::size_t                 c_; // XV‰ñ”
+		std::size_t                 c_; // æ›´æ–°å›æ•°
 	};
 }
 
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 	std::random_device device;
 	std::mt19937 engine(device());
 
-	std::vector<double> x(2); // “ü—ÍƒxƒNƒgƒ‹
+	std::vector<double> x(2); // å…¥åŠ›ãƒ™ã‚¯ãƒˆãƒ«
 	bool const data[][2] = {
 		{0,0},
 		{1,0},
@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
 	std::vector<double> deltaIs(1);
 	for (int epic = 0; epic < 1000; ++epic) {
 		for (int n = 0; n < data_size; ++n) {
-			// “ü—Íƒf[ƒ^‚ğì‚é
+			// å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 			x[0] = data[n][0];
 			x[1] = data[n][1];
 
@@ -243,13 +243,13 @@ int main(int argc, char* argv[])
 			//
 			// svm (hinge loss)
 			//
-			// ‹³tƒf[ƒ^‚ğì‚é
+			// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 			double const t = aka::expand<double>(aka::xor(aka::is_true(x[0]), aka::is_true(x[1])));
 
-			// ŒvZ‚µ‚Ä‚İ‚é
+			// è¨ˆç®—ã—ã¦ã¿ã‚‹
 			double const z = h.forward<true>(x)[0];
 
-			// Å¬‰»
+			// æœ€å°åŒ–
 			if (t*z < 1.0) {
 				deltaIs[0] = -t;
 				h.backword(x, deltaIs);
@@ -258,13 +258,13 @@ int main(int argc, char* argv[])
 			//
 			// logistic regression
 			//
-			// ‹³tƒf[ƒ^‚ğì‚é
+			// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 			double const t = aka::xor(aka::is_true(x[0]), aka::is_true(x[1]));
 
-			// ŒvZ‚µ‚Ä‚İ‚é
+			// è¨ˆç®—ã—ã¦ã¿ã‚‹
 			double const z = aka::sigmoid(h.forward<true>(x)[0]);
 
-			// Å¬‰»
+			// æœ€å°åŒ–
 			deltaIs[0] = z - t;
 			h.backword(x, deltaIs);
 #endif
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
 	}
 
 	for (int n = 0; n < data_size; ++n) {
-		// “ü—Íƒf[ƒ^‚ğì‚é
+		// å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 		x[0] = data[n][0];
 		x[1] = data[n][1];
 
@@ -280,10 +280,10 @@ int main(int argc, char* argv[])
 		//
 		// svm (hinge loss)
 		//
-		// ‹³tƒf[ƒ^‚ğì‚é
+		// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 		double const t = aka::expand<double>(aka::xor(aka::is_true(x[0]), aka::is_true(x[1])));
 
-		// ŒvZ‚µ‚Ä‚İ‚é
+		// è¨ˆç®—ã—ã¦ã¿ã‚‹
 		double const z = h.forward<true>(x)[0];
 
 		std::cout << x[0] << x[1] << '\t' << t << ':' << z << '\t' << (aka::is_positive(t) == aka::is_positive(z)) << '\n';
@@ -291,10 +291,10 @@ int main(int argc, char* argv[])
 		//
 		// logistic regression
 		//
-		// ‹³tƒf[ƒ^‚ğì‚é
+		// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 		double const t = aka::xor(aka::is_true(x[0]), aka::is_true(x[1]));
 
-		// ŒvZ‚µ‚Ä‚İ‚é
+		// è¨ˆç®—ã—ã¦ã¿ã‚‹
 		double const z = aka::sigmoid(h.forward<true>(x)[0]);
 
 		std::cout << x[0] << x[1] << '\t' << t << ':' << z << '\t' << (aka::is_true(t) == aka::is_true(z)) << '\n';
@@ -344,11 +344,11 @@ int main(int argc, char* argv[])
 
 	for (int epic = 0; epic < 1000; ++epic) {
 		for (int n = 0; n < data_size; ++n) {
-			// “ü—Íƒf[ƒ^‚ğì‚é
+			// å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 			x[0] = data[n][0];
 			x[1] = data[n][1];
 
-			// ‹³tƒf[ƒ^‚ğì‚é
+			// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 			double const t = aka::expand<double>(aka::xor(aka::is_true(x[0]), aka::is_true(x[1])));
 
 			machine.update(kernel, x, t);
@@ -356,14 +356,14 @@ int main(int argc, char* argv[])
 	}
 
 	for (int n = 0; n < data_size; ++n) {
-		// “ü—Íƒf[ƒ^‚ğì‚é
+		// å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 		x[0] = data[n][0];
 		x[1] = data[n][1];
 
-		// ‹³tƒf[ƒ^‚ğì‚é
+		// æ•™å¸«ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹
 		double const t = aka::expand<double>(aka::xor(aka::is_true(x[0]), aka::is_true(x[1])));
 
-		// ŒvZ‚µ‚Ä‚İ‚é
+		// è¨ˆç®—ã—ã¦ã¿ã‚‹
 		double const z = machine(kernel, x);
 
 		std::cout << x[0] << x[1] << '\t' << t << ':' << z << '\t' << (aka::is_positive(t) == aka::is_positive(z)) << '\n';

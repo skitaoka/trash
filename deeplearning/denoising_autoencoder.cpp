@@ -1,201 +1,255 @@
+//
+// denoising auto-encoder
+//
 #include "aka/math.hpp"
 
 namespace aka
 {
-	template <typename T>
-	class denoising_autoencoder
-	{
-	public:
-		denoising_autoencoder(std::size_t const _n, std::size_t const _m, std::mt19937 & engine)
-			: n_(_n)
-			, m_(_m)
-			, epoch_(0)
-			, weights_(_n * _m)
-			, offsetA_(_m)
-			, offsetB_(_n)
-		{
-			std::normal_distribution<T> dist(T(), T(0.01));
-			for (std::size_t k = 0, size = weights_.size(); k < size; ++k) {
-				weights_[k] = dist(engine);
-			}
-			for (std::size_t j = 0; j < _m; ++j) {
-				offsetA_[j] = dist(engine);
-			}
-			for (std::size_t i = 0; i < _n; ++i) {
-				offsetB_[i] = dist(engine);
-			}
-		}
+  template <typename T>
+  class denoising_autoencoder
+  {
+  public:
+    denoising_autoencoder(std::size_t const _n, std::size_t const _m, std::mt19937 & engine)
+      : n_(_n)
+      , m_(_m)
+      , epoch_(0)
+      , weights_(_n * _m)
+      , offsetA_(_m)
+      , offsetB_(_n)
+    {
+      std::normal_distribution<T> dist(T(), T(0.01));
+      for (std::size_t k = 0, size = weights_.size(); k < size; ++k) {
+        weights_[k] = dist(engine);
+      }
+      for (std::size_t j = 0; j < _m; ++j) {
+        offsetA_[j] = dist(engine);
+      }
+      for (std::size_t i = 0; i < _n; ++i) {
+        offsetB_[i] = dist(engine);
+      }
+    }
 
-		std::vector<T> operator () (std::vector<T> const & x) const
-		{
-			std::vector<T> y(m_);
-			for (std::size_t j = 0; j < m_; ++j) {
-				T f = T();
-				for (std::size_t i = 0; i < n_; ++i) {
-					f += weights_[j*n_+i] * x[i];
-				}
-				y[j] = aka::sigmoid(f + offsetA_[j]);
-			}
-		}
+    std::vector<T> operator () (std::vector<T> const & x) const
+    {
+      std::vector<T> y(m_);
+      for (std::size_t j = 0; j < m_; ++j) {
+        T f = T();
+        for (std::size_t i = 0; i < n_; ++i) {
+          f += weights_[j*n_+i] * x[i];
+        }
+        y[j] = aka::sigmoid(f + offsetA_[j]);
+      }
+    }
 
-		void learn(std::vector<std::vector<T>> const & x, T const eta, T const p, std::mt19937 & engine)
-		{
-			// å˘îz
-			std::vector<T> dw(n_*m_);
-			std::vector<T> da(m_);
-			std::vector<T> db(n_);
+    void learn(std::vector<std::vector<T>> const & x, T const eta, T const p, std::mt19937 & engine)
+    {
+      // ÂãæÈÖç
+      std::vector<T> dw(n_*m_);
+      std::vector<T> da(m_);
+      std::vector<T> db(n_);
 
-			// íÜä‘ïœêî
-			std::vector<T> x_noized(n_);
-			std::vector<T> y(m_);
-			std::vector<T> z(n_);
-			std::vector<T> xmz(n_);//= x-z
-			std::vector<T> y1my_wxmz(m_);//= y * (1-y) * (W (x-z))
+      // ‰∏≠ÈñìÂ§âÊï∞
+      std::vector<T> x_noized(n_);
+      std::vector<T> y(m_);
+      std::vector<T> z(n_);
+      std::vector<T> xmz(n_);//= x-z
+      std::vector<T> y1my_wxmz(m_);//= y * (1-y) * (W (x-z))
 
-			std::bernoulli_distribution dist(p);
+      std::bernoulli_distribution dist(p);
 
-			for (std::size_t k = 0, size = x.size(); k < size; ++k) {
-				for (std::size_t i = 0; i < n_; ++i) {
-					x_noized[i] = dist(engine) ? T(1) - x[k][i] : x[k][i];
-				}
+      for (std::size_t k = 0, size = x.size(); k < size; ++k) {
+        for (std::size_t i = 0; i < n_; ++i) {
+          x_noized[i] = dist(engine) ? T(1) - x[k][i] : x[k][i];
+        }
 
-				for (std::size_t j = 0; j < m_; ++j) {
-					T f = T();
-					for (std::size_t i = 0; i < n_; ++i) {
-						f += weights_[j*n_+i] * x_noized[i];
-					}
-					y[j] = aka::sigmoid(f + offsetA_[j]);
-				}
+        for (std::size_t j = 0; j < m_; ++j) {
+          T f = T();
+          for (std::size_t i = 0; i < n_; ++i) {
+            f += weights_[j*n_+i] * x_noized[i];
+          }
+          y[j] = aka::sigmoid(f + offsetA_[j]);
+        }
 
-				for (std::size_t i = 0; i < n_; ++i) {
-					T h = T();
-					for (std::size_t j = 0; j < m_; ++j) {
-						h += weights_[j*n_+i] * y[j];
-					}
-					z[i] = aka::sigmoid(h + offsetB_[i]);
-				}
+        for (std::size_t i = 0; i < n_; ++i) {
+          T h = T();
+          for (std::size_t j = 0; j < m_; ++j) {
+            h += weights_[j*n_+i] * y[j];
+          }
+          z[i] = aka::sigmoid(h + offsetB_[i]);
+        }
 
-				// x-z
-				for (std::size_t i = 0; i < n_; ++i) {
-					xmz[i] = x[k][i] - z[i];
-				}
+        // x-z
+        for (std::size_t i = 0; i < n_; ++i) {
+          xmz[i] = x[k][i] - z[i];
+        }
 
-				// y * (1-y) * (W (x-z))
-				for (std::size_t j = 0; j < m_; ++j) {
-					T a = T();
-					for (std::size_t i = 0; i < n_; ++i) {
-						a += weights_[j*n_+i] * xmz[i];
-					}
-					y1my_wxmz[j] = y[j] * (1 - y[j]) * a;
-				}
+        // y * (1-y) * (W (x-z))
+        for (std::size_t j = 0; j < m_; ++j) {
+          T a = T();
+          for (std::size_t i = 0; i < n_; ++i) {
+            a += weights_[j*n_+i] * xmz[i];
+          }
+          y1my_wxmz[j] = y[j] * (1 - y[j]) * a;
+        }
 
-				for (std::size_t j = 0; j < m_; ++j) {
-					for (std::size_t i = 0; i < n_; ++i) {
-						dw[j*n_+i] += y1my_wxmz[j] * x_noized[i] + y[j] * xmz[i];
-					}
-				}
-				for (std::size_t j = 0; j < m_; ++j) {
-					da[j] += y1my_wxmz[j];
-				}
-				for (std::size_t i = 0; i < n_; ++i) {
-					db[i] += xmz[i];
-				}
-			}
+        for (std::size_t j = 0; j < m_; ++j) {
+          for (std::size_t i = 0; i < n_; ++i) {
+            dw[j*n_+i] += y1my_wxmz[j] * x_noized[i] + y[j] * xmz[i];
+          }
+        }
+        for (std::size_t j = 0; j < m_; ++j) {
+          da[j] += y1my_wxmz[j];
+        }
+        for (std::size_t i = 0; i < n_; ++i) {
+          db[i] += xmz[i];
+        }
+      }
 
-			// å˘îzÇ…è]Ç¡ÇƒèdÇ›ÇçXêV.
-			T const alpha = eta / ++epoch_;
-			for (std::size_t k = 0, size = dw.size(); k < size; ++k) {
-				weights_[k] = weights_[k] + alpha * dw[k];
-			}
-			for (std::size_t j = 0; j < m_; ++j) {
-				offsetA_[j] = offsetA_[j] + alpha * da[j];
-			}
-			for (std::size_t i = 0; i < n_; ++i) {
-				offsetB_[i] = offsetB_[i] + alpha * db[i];
-			}
-		}
+      // ÂãæÈÖç„Å´Âæì„Å£„Å¶Èáç„Åø„ÇíÊõ¥Êñ∞.
+      T const alpha = eta / ++epoch_;
+      for (std::size_t k = 0, size = dw.size(); k < size; ++k) {
+        weights_[k] = weights_[k] + alpha * dw[k];
+      }
+      for (std::size_t j = 0; j < m_; ++j) {
+        offsetA_[j] = offsetA_[j] + alpha * da[j];
+      }
+      for (std::size_t i = 0; i < n_; ++i) {
+        offsetB_[i] = offsetB_[i] + alpha * db[i];
+      }
+    }
 
-		void show(std::vector<std::vector<T>> const & x)
-		{
-			std::vector<T> y(m_);
-			for (std::size_t k = 0, size = x.size(); k < size; ++k) {
-				std::cout << "input\t:";
-				for (std::size_t i = 0; i < n_; ++i) {
-					std::cout << '\t' << x[k][i];
-				}
-				std::cout << '\n';
-				
-				for (std::size_t j = 0; j < m_; ++j) {
-					T f = T();
-					for (std::size_t i = 0; i < n_; ++i) {
-						f += weights_[j*n_+i] * x[k][i];
-					}
-					y[j] = aka::sigmoid(f + offsetA_[j]);
-				}
-				
-				std::cout << "output\t:";
-				for (std::size_t i = 0; i < n_; ++i) {
-					T h = T();
-					for (std::size_t j = 0; j < m_; ++j) {
-						h += weights_[j*n_+i] * y[j];
-					}
-					T const zi = aka::sigmoid(h + offsetB_[i]);
-					std::cout << '\t' << aka::is_true(zi);
-				}
-				std::cout << '\n';
+    void show(std::vector<std::vector<T>> const & x)
+    {
+      std::vector<T> y(m_);
+      for (std::size_t k = 0, size = x.size(); k < size; ++k) {
+        std::cout << "input\t:";
+        for (std::size_t i = 0; i < n_; ++i) {
+          std::cout << '\t' << x[k][i];
+        }
+        std::cout << '\n';
+        
+        for (std::size_t j = 0; j < m_; ++j) {
+          T f = T();
+          for (std::size_t i = 0; i < n_; ++i) {
+            f += weights_[j*n_+i] * x[k][i];
+          }
+          y[j] = aka::sigmoid(f + offsetA_[j]);
+        }
+        
+        std::cout << "output\t:";
+        for (std::size_t i = 0; i < n_; ++i) {
+          T h = T();
+          for (std::size_t j = 0; j < m_; ++j) {
+            h += weights_[j*n_+i] * y[j];
+          }
+          T const zi = aka::sigmoid(h + offsetB_[i]);
+          std::cout << '\t' << aka::is_true(zi);
+        }
+        std::cout << '\n';
 
-				std::cout << "hidden\t:";
-				for (std::size_t j = 0; j < m_; ++j) {
-					std::cout << '\t' << y[j];
-				}
+        std::cout << "hidden\t:";
+        for (std::size_t j = 0; j < m_; ++j) {
+          std::cout << '\t' << y[j];
+        }
 
-				std::cout << "\n\n";
-			}
-		}
+        std::cout << "\n\n";
+      }
+    }
 
-	private:
-		std::size_t const n_; // ì¸óÕëwÇÃéüå≥
-		std::size_t const m_; // èoóÕëwÇÃéüå≥
-		std::size_t    epoch_;
-		std::vector<T> weights_;
-		std::vector<T> offsetA_;
-		std::vector<T> offsetB_;
-	};
+  private:
+    std::size_t const n_; // ÂÖ•ÂäõÂ±§„ÅÆÊ¨°ÂÖÉ
+    std::size_t const m_; // Âá∫ÂäõÂ±§„ÅÆÊ¨°ÂÖÉ
+    std::size_t    epoch_;
+    std::vector<T> weights_;
+    std::vector<T> offsetA_;
+    std::vector<T> offsetB_;
+  };
 }
 
 int main(int argc, char* argv[])
 {
-	std::ios::sync_with_stdio(false);
+  std::ios::sync_with_stdio(false);
 
-	std::random_device device;
-	std::mt19937 engine(device());
+  std::random_device device;
+  std::mt19937 engine(device());
 
-	// input example:
-	//  10 1 10000 0.5 0.3
-	//  2
-	//  0 0 0 0 0 1 1 1 1 1
-	//  1 1 1 1 1 0 0 0 0 0
+  // input example:
+  //  10 1 10000 0.5 0.3
+  //  2
+  //  0 0 0 0 0 1 1 1 1 1
+  //  1 1 1 1 1 0 0 0 0 0
 
-	std::size_t n;    std::cin >> n;    // ì¸óÕéüå≥
-	std::size_t m;    std::cin >> m;    // èoóÕéüå≥
-	std::size_t itrs; std::cin >> itrs; // îΩïúâÒêî
-	double      eta;  std::cin >> eta;  // äwèKó¶
-	double      p;    std::cin >> p;    // ÉhÉçÉbÉvó¶
-	std::size_t size; std::cin >> size; // ÉfÅ[É^ÉTÉCÉY
+  std::size_t n;    std::cin >> n;    // ÂÖ•ÂäõÊ¨°ÂÖÉ
+  std::size_t m;    std::cin >> m;    // Âá∫ÂäõÊ¨°ÂÖÉ
+  std::size_t itrs; std::cin >> itrs; // ÂèçÂæ©ÂõûÊï∞
+  double      eta;  std::cin >> eta;  // Â≠¶ÁøíÁéá
+  double      p;    std::cin >> p;    // „Éâ„É≠„ÉÉ„ÉóÁéá
+  std::size_t size; std::cin >> size; // „Éá„Éº„Çø„Çµ„Ç§„Ç∫
 
-	std::vector<std::vector<double>> x(size);
-	for (std::size_t k = 0; k < size; ++k) {
-		x[k].resize(n);
-		for (std::size_t i = 0; i < n; ++i) {
-			std::cin >> x[k][i];
-		}
-	}
+  std::vector<std::vector<double>> x(size);
+  for (std::size_t k = 0; k < size; ++k) {
+    x[k].resize(n);
+    for (std::size_t i = 0; i < n; ++i) {
+      std::cin >> x[k][i];
+    }
+  }
 
-	aka::denoising_autoencoder<double> da(n, m, engine);
-	for (std::size_t epoch = 0; epoch < itrs; ++epoch) {
-		da.learn(x, eta, p, engine);
-	}
-	da.show(x);
+  aka::denoising_autoencoder<double> da(n, m, engine);
+  for (std::size_t epoch = 0; epoch < itrs; ++epoch) {
+    da.learn(x, eta, p, engine);
+  }
+  da.show(x);
 
-	return 0;
+  return 0;
 }
+/*
+  input  vector: x
+  noized vector: X --- x „Å´„Éé„Ç§„Ç∫„ÇíÊ∑ªÂä†„Åó„Åü„Éô„ÇØ„Éà„É´
+  hidden vector: y
+  output vector: z
+  weight matrix: W
+  baias vectors: b, c
+
+  encode: y = s(f(X)), where f(X) = W   X + b
+  decode: z = s(g(y)), where g(y) = W^T y + c
+
+  s (x) = 1/(1+exp(-x)): „Ç∑„Ç∞„É¢„Ç§„ÉâÈñ¢Êï∞
+  s'(x) = s(x) (1-s(x)): „Ç∑„Ç∞„É¢„Ç§„ÉâÈñ¢Êï∞„ÅÆÂæÆÂàÜ
+
+  ‰∫§Â∑Æ„Ç®„É≥„Éà„É≠„Éî„Éº L(x,z) = 1^T [x * log(z) + (1-x) log(1-z)] „ÇíÊúÄÂ§ßÂåñ„Åô„Çã (W,b,c) „ÇíÊ±Ç„ÇÅ„Çã.
+      --- 1 is a vector.
+      --- * is a element-wise multiplication.
+
+    dL/dW = (dL/dz dz/dg) dg/dy dy/df df/dW + (dL/dz dz/dg) dg/dW
+    dL/db = (dL/dz dz/dg) dg/dy dy/df df/db
+    dL/dc = (dL/dz dz/dg) dg/dc
+
+      dL/dz = x/z - (1-x)/(1-z)
+      dz/dg = z * (1-z)
+    
+      (dL/dz dz/dg) = (x/z - (1-x)/(1-z)) * (z * (1-z))
+                    = x * (1-z) - (1-x) * z
+                    = x - x * z - z + x * z
+                    = (x-z)
+
+      dg/dy = W^T
+
+      dy/df = y * (1-y)
+      df/dW = X
+      dg/dW = y^T
+
+      df/db = 1
+      dg/dc = 1
+
+      (dL/dz dz/dg) dg/dy = (x-z)^T W^T
+                          = W (x-z)
+
+  ÂãæÈÖç:
+    dL/dW = ((W (x-z)) * y * (1-y)) X^T + y (x-z)^T
+    dL/db =  (W (x-z)) * y * (1-y)
+    dL/dc =     (x-z)
+
+  „Éô„ÇØ„Éà„É´„ÅÆÂæÆÂàÜ:
+    d x/dx = 1
+    dAx/dx = A
+*/
