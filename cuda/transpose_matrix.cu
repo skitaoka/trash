@@ -1,5 +1,5 @@
 template <typename T>
-__global__ void transpose(T * dst, T const * src, int const m, int const n)
+__global__ void transpose(T * dst, T const * src, int const w, int const h)
 {
   int const x = threadIdx.x + blockIdx.x + blockDim.x;
   int const y = threadIdx.y + blockIdx.y + blockDim.y;
@@ -10,7 +10,7 @@ __global__ void transpose(T * dst, T const * src, int const m, int const n)
 }
 
 template <int kBlockSize, typename T>
-__global__ void transpose(T * dst, T const * src, int const m, int const n)
+__global__ void transpose(T * dst, T const * src, int const w, int const h)
 {
   __shared__ T buf[kBlockSize][kBlockSize+1]; // +1 for avoiding bank conflicts.
 
