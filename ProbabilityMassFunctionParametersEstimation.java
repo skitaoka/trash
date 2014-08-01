@@ -45,9 +45,6 @@ class ProbabilityMassFunctionParametersEstimation {
     // 確率的勾配法で計算
     System.out.println("確率的勾配法で計算");
     double[] y = new double[p.length]; // 推定値
-    y[0] = Math.log(p[0]);
-    y[1] = Math.log(p[1]);
-    y[2] = Math.log(p[2]);
     for (int epoch = 1; epoch <= 1000; ++epoch) {
       double alpha = 1.0 / (epoch + 1) / sample_size; // 学習率
 
@@ -87,9 +84,6 @@ class ProbabilityMassFunctionParametersEstimation {
     // 勾配法 (ラグランジュの未定乗数法) で計算
     System.out.println("ラグランジュの未定乗数法で計算");
     double[] z = new double[p.length]; // 推定値
-    z[0] = Math.log(p[0]);
-    z[1] = Math.log(p[1]);
-    z[2] = Math.log(p[2]);
     double lambda = -0.1;
     for (int epoch = 1; epoch <= 1000; ++epoch) {
       double alpha = 1.0 / (epoch + 1) / sample_size; // 学習率
@@ -105,16 +99,16 @@ class ProbabilityMassFunctionParametersEstimation {
         double ec = Math.exp(z[2]);
 
         // 勾配を計算
-        da += 0.5 * x[i] * (x[i] - 1) + lambda * ea;
-        db +=       (1 - x[i] * x[i]) + lambda * eb;
-        dc += 0.5 * x[i] * (x[i] + 1) + lambda * ec;
+        da +=  0.5 * x[i] * (1 - x[i]) - lambda * ea;
+        db +=        (x[i] * x[i] - 1) - lambda * eb;
+        dc += -0.5 * x[i] * (1 + x[i]) - lambda * ec;
         dl += (ea + eb + ec) - 1;
       }
 
       // ちょっと更新
-      z[0]   += alpha * da;
-      z[1]   += alpha * db;
-      z[2]   += alpha * dc;
+      z[0]   -= alpha * da;
+      z[1]   -= alpha * db;
+      z[2]   -= alpha * dc;
       lambda -= alpha * dl;
     }
     {
@@ -131,6 +125,7 @@ class ProbabilityMassFunctionParametersEstimation {
       for (int i = 0, length = f.length; i < length; ++i) {
         System.out.println(z[i]);
       }
+      System.out.println(sum);
     }
   }
 }
