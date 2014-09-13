@@ -1,10 +1,18 @@
 //
 // denoising auto-encoder
 //
-#include "aka/math.hpp"
+#include <iostream>
+#include <vector>
+#include <random>
 
 namespace aka
 {
+  template <typename T>
+  inline T sigmoid(T const x)
+  {
+    return T(1) / (T(1) + std::exp(x));
+  }
+
   template <typename T>
   class denoising_autoencoder
   {
@@ -127,7 +135,7 @@ namespace aka
           std::cout << '\t' << x[k][i];
         }
         std::cout << '\n';
-        
+
         for (std::size_t j = 0; j < m_; ++j) {
           T f = T();
           for (std::size_t i = 0; i < n_; ++i) {
@@ -135,7 +143,7 @@ namespace aka
           }
           y[j] = aka::sigmoid(f + offsetA_[j]);
         }
-        
+
         std::cout << "output\t:";
         for (std::size_t i = 0; i < n_; ++i) {
           T h = T();
@@ -143,7 +151,7 @@ namespace aka
             h += weights_[j*n_+i] * y[j];
           }
           T const zi = aka::sigmoid(h + offsetB_[i]);
-          std::cout << '\t' << aka::is_true(zi);
+          std::cout << '\t' << ((zi < 0.5) ? 0 : 1);
         }
         std::cout << '\n';
 
@@ -226,7 +234,7 @@ int main(int argc, char* argv[])
 
       dL/dz = x/z - (1-x)/(1-z)
       dz/dg = z * (1-z)
-    
+
       (dL/dz dz/dg) = (x/z - (1-x)/(1-z)) * (z * (1-z))
                     = x * (1-z) - (1-x) * z
                     = x - x * z - z + x * z
