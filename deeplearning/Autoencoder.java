@@ -64,81 +64,172 @@ final class Autoencoder {
 
   private static enum Type {
     BINOMIAL {
+      // 入力の 1 の数から求めるべき
       @Override
-      double noise(double x, Random engine) {
-        return engine.nextBoolean() ? 1.0 - x : x;
+      void noise(double[] v, double[] x, Random engine) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; ++i) {
+          switch (engine.nextInt(3)) {
+          case  0: v[i] = 0.00; break;
+          case  1: v[i] = 1.00; break;
+          default: v[i] = x[i]; break;
+          }
+        }
       }
 
       @Override
-      double link(double x) {
-        return sigmoid(x);
+      void link(double[] v, double[] x) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; ++i) {
+          v[i] = sigmoid(x[i]);
+        }
       }
 
       // 交差エントロピー: -x log(z) - (1-x) log(1-z)
       @Override
-      double error(double x, double z) {
-        return
-          -        x  * Math.log(      z)
-          - (1.0 - x) * Math.log(1.0 - z);
+      double error(double[] x, double[] z) {
+        assert(x.length == z.length);
+
+        double retval = 0.0;
+        for (int i = 0, length = x.length; i < length; ++i) {
+          retval +=       x[i]  * Math.log(      z[i])
+                 + (1.0 - x[i]) * Math.log(1.0 - z[i]);
+        }
+        return -retval;
+      }
+    },
+
+    // 3-class
+    MULTICLASS {
+      @Override
+      void noise(double[] v, double[] x, Random engine) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; i += 3) {
+          switch (engine.nextInt(6)) {
+          case  0: v[i] = 1.0000; v[i+1] = 0.0000; v[i+2] = 0.0000; break;
+          case  1: v[i] = 0.0000; v[i+1] = 1.0000; v[i+2] = 0.0000; break;
+          case  2: v[i] = 0.0000; v[i+1] = 0.0000; v[i+2] = 1.0000; break;
+          default: v[i] = x[i+0]; v[i+1] = x[i+1]; v[i+2] = x[i+2]; break;
+          }
+        }
+      }
+
+      @Override
+      void link(double[] v, double[] x) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; i += 3) {
+          double xmax = Double.NEGATIVE_INFINITY;
+          for (int j = 0; j < 3; ++j) {
+            double value = x[i+j];
+            if (xmax < value) {
+              xmax = value;
+            }
+          }
+          double zsum = 0.0;
+          for (int j = 0; j < 3; ++j) {
+            double value = Math.exp(x[i+j] - xmax);
+            v[i+j] = value;
+            zsum  += value;
+          }
+          zsum = 1.0 / zsum;
+          for (int j = 0; j < 3; ++j) {
+            v[i+j] *= zsum;
+          }
+        }
+      }
+
+      // 交差エントロピー : -x log(z)
+      @Override
+      double error(double[] x, double[] z) {
+        assert(x.length == z.length);
+
+        double retval = 0.0;
+        for (int i = 0, length = x.length; i < length; ++i) {
+          retval += x[i] * Math.log(z[i]);
+        }
+        return -retval;
       }
     },
 
     REAL {
       @Override
-      double noise(double x, Random engine) {
-        return x + engine.nextGaussian();
+      void noise(double[] v, double[] x, Random engine) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; ++i) {
+          v[i] = x[i] + engine.nextGaussian();
+        }
       }
 
       @Override
-      double link(double x) {
-        return x;
+      void link(double[] v, double[] x) {
+        assert(v.length == x.length);
+        if (v != x) {
+          System.arraycopy(x, 0, v, 0, x.length);
+        }
       }
 
       // 二乗誤差: 1/2 (x - z)^2
       @Override
-      double error(double x, double z) {
-        return 0.5 * (x - z) * (x - z);
+      double error(double[] x, double[] z) {
+        assert(x.length == z.length);
+
+        double retval = 0.0;
+        for (int i = 0, length = x.length; i < length; ++i) {
+          double e = x[i] - z[i];
+          retval += e * e;
+        }
+        return 0.5 * retval;
       }
     },
 
     NONNEGATIVE{
       @Override
-      double noise(double x, Random engine) {
-        // 平均 x のポアソン分布からサンプリングする
-        double a = Math.exp(-x);
+      void noise(double[] v, double[] x, Random engine) {
+        assert(v.length == x.length);
 
-        int k = 0;
-        for (double xp = engine.nextDouble(); a <= xp; ++k) {
-          xp *= engine.nextDouble();
+        for (int i = 0, length = x.length; i < length; ++i) {
+          // 平均 x のポアソン分布からサンプリングする
+          double a = Math.exp(-x[i]);
+
+          int k = 0;
+          for (double xp = engine.nextDouble(); a <= xp; xp *= engine.nextDouble()) {
+            ++k;
+          }
+
+          v[i] = k;
         }
-        return k;
       }
 
       @Override
-      double link(double x) {
-        return Math.exp(x);
+      void link(double[] v, double[] x) {
+        assert(v.length == x.length);
+
+        for (int i = 0, length = x.length; i < length; ++i) {
+          v[i] = Math.exp(x[i]);
+        }
       }
 
       // I-ダイバージェンス: x log(x/z) + (x - z)
       @Override
-      double error(double x, double z) {
-        assert(x < 0.0);
-        assert(z < 0.0);
-/*
-        double err = x - z;
-        if (x > 0.0) {
-          err += x * Math.log(x / z);
+      double error(double[] x, double[] z) {
+        assert(x.length == z.length);
+
+        double retval = 0.0;
+        for (int i = 0, length = x.length; i < length; ++i) {
+          retval += z[i] - x[i] * Math.log(z[i]);
         }
-        return err;
-/*/
-        return z - x * Math.log(z);
-//*/
+        return retval;
       }
     };
 
-    abstract double noise(double x, Random engine);
-    abstract double link (double x);
-    abstract double error(double x, double z);
+    abstract void   noise(double[] v, double[] x, Random engine);
+    abstract void   link (double[] v, double[] x);
+    abstract double error(double[] x, double[] z);
   }
 
   private static enum Unit {
@@ -243,8 +334,9 @@ final class Autoencoder {
       for (int j = 0; j < m; ++j) {
         sum += c[i][j] * y[j];
       }
-      z[i] = type.link(sum);
+      z[i] = sum;
     }
+    type.link(z, z);
 
     return z;
   }
@@ -372,7 +464,7 @@ final class Autoencoder {
         }
       }
 
-      double e0 = error(x, z);
+      double e0 = type.error(x, z);
       {
         // ランダムな微小変化配列を作る
         double[][] _ = new double[m][n];
@@ -384,7 +476,7 @@ final class Autoencoder {
           }
         }
 
-        double e1 = error(x, cypd(c, axpb(A, x, b, unit)[1], d, type));
+        double e1 = type.error(x, cypd(c, axpb(A, x, b, unit)[1], d, type));
 
         // e0-e1 = trace[df(A)/dA^T _] となっているはず
         System.out.printf("A: %e\n", re(e0-e1, trace(mul(da, true, _))));
@@ -400,7 +492,7 @@ final class Autoencoder {
           }
         }
 
-        double e1 = error(x, cypd(C, y[1], d, type));
+        double e1 = type.error(x, cypd(C, y[1], d, type));
 
         // e0-e1 = trace[df(A)/dC^T _] となっているはず
         System.out.printf("C: %e\n", re(e0-e1, trace(mul(dc, true, _))));
@@ -531,9 +623,9 @@ final class Autoencoder {
     for (int i = 0, size = a.length; i < size; ++i) {
       for (double _ : a[i]) {
         System.out.printf("\t% 3.2f", _);
-      }{
+      }/* always */{
         System.out.printf("\t% 3.2f", b[i]);
-      }{
+      }/* always */{
         System.out.println();
       }
     }
@@ -545,23 +637,11 @@ final class Autoencoder {
     show("c", c, d);
   }
 
-  private double error(double[] x, double[] z) {
-    double retval = 0.0;
-    {
-      int n = x.length;
-      for (int i = 0; i < n; ++i) {
-        retval += type.error(x[i], z[i]);
-      }
-      //retval /= n;
-    }
-    return retval;
-  }
-
   private void show(double[] x) {
     double[] y = axpb(a, x, b, unit)[1];
     double[] z = cypd(c, y, d, type);
 
-    System.out.printf("%1.2e\n", error(x, z));
+    System.out.printf("%1.2e\n", type.error(x, z));
 
     // show log
     show("x", x);
@@ -581,15 +661,15 @@ final class Autoencoder {
     };
 /*/
     double[][] x = new double[][] {
-      {1, 1, 0, 0, 0, 0},
-      {0, 0, 1, 1, 0, 0},
-      {0, 0, 0, 0, 1, 1},
+      {1, 0, 0, 1, 0, 0},
+      {1, 0, 0, 0, 1, 0},
       {1, 0, 0, 0, 0, 1},
-      {1, 0, 1, 1, 0, 1},
-      {1, 1, 0, 0, 1, 1},
-      {1, 1, 0, 0, 1, 1},
-      {1, 1, 1, 1, 0, 0},
-      {0, 0, 1, 1, 1, 1},
+      {0, 1, 0, 1, 0, 0},
+      {0, 1, 0, 0, 1, 0},
+      {0, 1, 0, 0, 0, 1},
+      {0, 0, 1, 1, 0, 0},
+      {0, 0, 1, 0, 1, 0},
+      {0, 0, 1, 0, 0, 1},
     };
 //*/
     int size   = x.length; // sample size
@@ -597,7 +677,7 @@ final class Autoencoder {
 
     Random engine = new Random();
 
-    Autoencoder encoder = new Autoencoder(Type.BINOMIAL, Unit.SIGMOID, 0.0, length, length/2);
+    Autoencoder encoder = new Autoencoder(Type.MULTICLASS, Unit.SIGMOID, 0.0, length, length/2);
 
     for (int e = 1; e <= 100000; ++e) {
       encoder.learn(size, x, 1.0 / (Math.sqrt(e) * length), engine);
