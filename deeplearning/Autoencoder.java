@@ -62,8 +62,29 @@ final class Autoencoder {
     return 1.0 / (1.0 + Math.exp(-x));
   }
 
+  // 平均 x のポアソン分布からサンプリングする
+  private static int poisson(double x, Random engine) {
+    double a = Math.exp(-x);
+
+    int k = 0;
+    for (double p = engine.nextDouble(); a <= p; p *= engine.nextDouble()) {
+      ++k;
+    }
+
+    return k;
+  }
+
   private static enum Type {
     BINOMIAL {
+      @Override
+      double[] random(int length, Random engine) {
+        double[] x = new double[length];
+        for (int i = 0; i < length; ++i) {
+          x[i] = engine.nextBoolean() ? 1.0 : 0.0;
+        }
+        return x;
+      }
+
       // 入力の 1 の数から求めるべき
       @Override
       void noise(double[] v, double[] x, Random engine) {
@@ -103,6 +124,15 @@ final class Autoencoder {
 
     // 3-class
     MULTICLASS {
+      @Override
+      double[] random(int length, Random engine) {
+        double[] x = new double[length];
+        for (int i = 0; i < length; i += 3) {
+          x[i + engine.nextInt(3)] = 1.0;
+        }
+        return x;
+      }
+
       @Override
       void noise(double[] v, double[] x, Random engine) {
         assert(v.length == x.length);
@@ -157,6 +187,15 @@ final class Autoencoder {
 
     REAL {
       @Override
+      double[] random(int length, Random engine) {
+        double[] x = new double[length];
+        for (int i = 0; i < length; ++i) {
+          x[i] = engine.nextGaussian();
+        }
+        return x;
+      }
+
+      @Override
       void noise(double[] v, double[] x, Random engine) {
         assert(v.length == x.length);
 
@@ -189,19 +228,20 @@ final class Autoencoder {
 
     NONNEGATIVE{
       @Override
+      double[] random(int length, Random engine) {
+        double[] x = new double[length];
+        for (int i = 0; i < length; ++i) {
+          x[i] = poisson(3.0, engine);
+        }
+        return x;
+      }
+
+      @Override
       void noise(double[] v, double[] x, Random engine) {
         assert(v.length == x.length);
 
         for (int i = 0, length = x.length; i < length; ++i) {
-          // 平均 x のポアソン分布からサンプリングする
-          double a = Math.exp(-x[i]);
-
-          int k = 0;
-          for (double xp = engine.nextDouble(); a <= xp; xp *= engine.nextDouble()) {
-            ++k;
-          }
-
-          v[i] = k;
+          v[i] = poisson(x[i], engine);
         }
       }
 
@@ -226,6 +266,9 @@ final class Autoencoder {
         return retval;
       }
     };
+
+    // generate a randomized input vector
+    abstract double[] random(int length, Random engine);
 
     abstract void   noise(double[] v, double[] x, Random engine);
     abstract void   link (double[] v, double[] x);
@@ -430,10 +473,7 @@ final class Autoencoder {
     // a
     {
       // ランダムな入力配列を作る
-      double[] x = new double[n];
-      for (int i = 0; i < n; ++i) {
-        x[i] = engine.nextGaussian();
-      }
+      double[] x = type.random(n, engine);
 
       // 誤差をはかる
       double[][] y = axpb(a, x   , b, unit);
@@ -479,7 +519,7 @@ final class Autoencoder {
         double e1 = type.error(x, cypd(c, axpb(A, x, b, unit)[1], d, type));
 
         // e0-e1 = trace[df(A)/dA^T _] となっているはず
-        System.out.printf("A: %e\n", re(e0-e1, trace(mul(da, true, _))));
+        System.out.printf("A: % e\n", re(e0-e1, trace(mul(da, true, _))));
       }
       {
         // ランダムな微小変化配列を作る
@@ -495,7 +535,7 @@ final class Autoencoder {
         double e1 = type.error(x, cypd(C, y[1], d, type));
 
         // e0-e1 = trace[df(A)/dC^T _] となっているはず
-        System.out.printf("C: %e\n", re(e0-e1, trace(mul(dc, true, _))));
+        System.out.printf("C: % e\n", re(e0-e1, trace(mul(dc, true, _))));
       }
     }
   }
@@ -641,7 +681,7 @@ final class Autoencoder {
     double[] y = axpb(a, x, b, unit)[1];
     double[] z = cypd(c, y, d, type);
 
-    System.out.printf("%1.2e\n", type.error(x, z));
+    System.out.printf("% 1.2e\n", type.error(x, z));
 
     // show log
     show("x", x);
