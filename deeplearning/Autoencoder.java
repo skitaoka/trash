@@ -14,16 +14,12 @@ final class Autoencoder {
   private final int m; // output dims.
 
   private final double[][] a; // weight matrix
-  private final double[]   b; // offset vector
-  private final double[][] c; // weight matrix
-  private final double[]   d; // offset vector
+  private final double[][] b; // weight matrix
 
   private final double[][] da; // dL/dA
-  private final double[]   db; // dL/db
-  private final double[][] dc; // dL/dc
-  private final double[]   dd; // dL/dd
+  private final double[][] db; // dL/dB
 
-  Autoencoder(Type type, Unit unit, double beta, int n, int m) {
+  Autoencoder(Type type, Unit unit, double beta, int n, int m, Random engine) {
     this.type = type;
     this.unit = unit;
     this.beta = beta;
@@ -31,33 +27,25 @@ final class Autoencoder {
     this.n = n;
     this.m = m;
 
-    this.a = new double[m][n];
-    this.b = new double[m];
-    this.c = new double[n][m];
-    this.d = new double[n];
+    this.a = new double[m][n+1];
+    this.b = new double[n][m+1];
 
-    this.da = new double[m][n];
-    this.db = new double[m];
-    this.dc = new double[n][m];
-    this.dd = new double[n];
+    this.da = new double[m][n+1];
+    this.db = new double[n][m+1];
 
-    java.util.Random rand = new java.util.Random();
     for (int i = 0; i < m; ++i) {
-      for (int j = 0; j < n; ++j) {
-        a[i][j] = rand.nextGaussian() * 0.1;
-      }/* always */{
-        b[i]    = rand.nextGaussian() * 0.1;
+      for (int j = 0; j <= n; ++j) {
+        a[i][j] = engine.nextGaussian() * 0.1;
       }
     }
     for (int j = 0; j < n; ++j) {
-      for (int i = 0; i < m; ++i) {
-        c[j][i] = rand.nextGaussian() * 0.1;
-      }/* always */{
-        d[j]    = rand.nextGaussian() * 0.1;
+      for (int i = 0; i <= m; ++i) {
+        b[j][i] = engine.nextGaussian() * 0.1;
       }
     }
   }
 
+  // シグモイド関数
   private static double sigmoid(double x) {
     return 1.0 / (1.0 + Math.exp(-x));
   }
@@ -356,15 +344,17 @@ final class Autoencoder {
     abstract double g(double x, double y);
   }
 
-  // y = f(A x + b)
-  private static double[][] axpb(double[][] a, double[] x, double[] b, Unit unit) {
-    int m = a   .length;
-    int n = a[0].length;
+  // y = f(A x)
+  private static double[][] ax(double[][] a, double[] x, Unit unit) {
+    int m = a.length;
+    int n = x.length;
     double[][] y = new double[2][a.length];
     for (int j = 0; j < m; ++j) {
-      double sum = b[j];
+      double sum = 0.0;
       for (int i = 0; i < n; ++i) {
         sum += a[j][i] * x[i];
+      }/* always */{
+        sum += a[j][n];
       }
       y[0][j] = sum;
       y[1][j] = unit.f(sum);
@@ -372,15 +362,17 @@ final class Autoencoder {
     return y;
   }
 
-  // z = f(C y + d)
-  private static double[] cypd(double[][] c, double[] y, double[] d, Type type) {
-    int m = c[0].length;
-    int n = c   .length;
+  // z = f(B y)
+  private static double[] cy(double[][] b, double[] y, Type type) {
+    int m = y.length;
+    int n = b.length;
     double[] z = new double[n];
     for (int i = 0; i < n; ++i) {
-      double sum = d[i];
+      double sum = 0.0;
       for (int j = 0; j < m; ++j) {
-        sum += c[i][j] * y[j];
+        sum += b[i][j] * y[j];
+      }/* always */{
+        sum += b[i][m];
       }
       z[i] = sum;
     }
@@ -389,77 +381,78 @@ final class Autoencoder {
     return z;
   }
 
-  private static double[] mul(double[][] a, boolean transpose, double[] x) {
+  private static double[][] mul(double[][] a, boolean at, double[][] b, boolean bt) {
     int m = a   .length;
     int n = a[0].length;
 
-    if (transpose) {
-      assert(m == x.length);
+    if (at) {
+      if (bt) {
+        assert(m == b[0].length);
 
-      double[] y = new double[n];
-      for (int j = 0; j < n; ++j) {
-        double sum = 0.0;
+        int l = b.length;
+
+        double[][] c = new double[n][l];
+        for (int i = 0; i < n; ++i) {
+          for (int j = 0; j < l; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < m; ++k) {
+              sum += a[k][i] * b[j][k];
+            }
+            c[i][j] = sum;
+          }
+        }
+        return c;
+      } else {
+        assert(m == b.length);
+
+        int l = b[0].length;
+
+        double[][] c = new double[n][l];
+        for (int i = 0; i < n; ++i) {
+          for (int j = 0; j < l; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < m; ++k) {
+              sum += a[k][i] * b[k][j];
+            }
+            c[i][j] = sum;
+          }
+        }
+        return c;
+      }
+    } else {
+      if (bt) {
+        assert(n == b[0].length);
+
+        int l = b.length;
+
+        double[][] c = new double[m][l];
         for (int i = 0; i < m; ++i) {
-          sum += a[i][j] * x[i];
-        }
-        y[j] = sum;
-      }
-
-      return y;
-    } else {
-      assert(n == x.length);
-
-      double[] y = new double[m];
-      for (int i = 0; i < m; ++i) {
-        double sum = 0.0;
-        for (int j = 0; j < n; ++j) {
-          sum += a[i][j] * x[j];
-        }
-        y[i] = sum;
-      }
-
-      return y;
-    }
-  }
-
-  private static double[][] mul(double[][] a, boolean transpose, double[][] b) {
-    int m = a   .length;
-    int n = a[0].length;
-
-    if (transpose) {
-      assert(m == b.length);
-
-      int l = b[0].length;
-
-      double[][] c = new double[n][l];
-      for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < l; ++j) {
-          double sum = 0.0;
-          for (int k = 0; k < m; ++k) {
-            sum += a[k][i] * b[k][j];
+          for (int j = 0; j < l; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < n; ++k) {
+              sum += a[i][k] * b[j][k];
+            }
+            c[i][j] = sum;
           }
-          c[i][j] = sum;
         }
-      }
+        return c;
+      } else {
+        assert(n == b.length);
 
-      return c;
-    } else {
-      assert(n == b.length);
+        int l = b[0].length;
 
-      int l = b[0].length;
-
-      double[][] c = new double[m][l];
-      for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < l; ++j) {
-          double sum = 0.0;
-          for (int k = 0; k < n; ++k) {
-            sum += a[i][k] * b[k][j];
+        double[][] c = new double[m][l];
+        for (int i = 0; i < m; ++i) {
+          for (int j = 0; j < l; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < n; ++k) {
+              sum += a[i][k] * b[k][j];
+            }
+            c[i][j] = sum;
           }
-          c[i][j] = sum;
         }
+        return c;
       }
-
-      return c;
     }
   }
 
@@ -481,66 +474,66 @@ final class Autoencoder {
       double[] x = type.random(n, engine);
 
       // 誤差をはかる
-      double[][] y = axpb(a, x   , b, unit);
-      double[]   z = cypd(c, y[1], d, type);
+      double[][] y = ax(a, x   , unit);
+      double[]   z = cy(b, y[1], type);
 
       // df(A)/dA を作る
       for (int k = 0; k < m; ++k) {
         double sum = 0.0;
         // C^T(x-z) * y * (1-y)
         for (int j = 0; j < n; ++j) {
-          sum += c[j][k] * (x[j] - z[j]);
+          sum += b[j][k] * (x[j] - z[j]);
         }
         sum *= unit.g(y[0][k], y[1][k]);
 
         for (int j = 0; j < n; ++j) {
           da[k][j] = sum * x[j];
         }/* always */{
-          db[k]    = sum;
+          da[k][n] = sum;
         }
       }
 
-      // df(C)/dC を作る
+      // df(B)/dB を作る
       for (int j = 0; j < n; ++j) {
         for (int k = 0; k < m; ++k) {
-          dc[j][k] = (x[j] - z[j]) * y[1][k];
+          db[j][k] = (x[j] - z[j]) * y[1][k];
         }/* always */{
-          dd[j]    = (x[j] - z[j]);
+          db[j][m] = (x[j] - z[j]);
         }
       }
 
       double e0 = type.error(x, z);
       {
         // ランダムな微小変化配列を作る
-        double[][] _ = new double[m][n];
-        double[][] A = new double[m][n];
+        double[][] _ = new double[m][n+1];
+        double[][] A = new double[m][n+1];
         for (int i = 0; i < m; ++i) {
-          for (int j = 0; j < n; ++j) {
+          for (int j = 0; j <= n; ++j) {
             _[i][j] = engine.nextDouble() * 1e-6;
             A[i][j] = a[i][j] + _[i][j];
           }
         }
 
-        double e1 = type.error(x, cypd(c, axpb(A, x, b, unit)[1], d, type));
+        double e1 = type.error(x, cy(b, ax(A, x, unit)[1], type));
 
-        // e0-e1 = trace[df(A)/dA^T _] となっているはず
-        System.out.printf("A: % e\n", re(e1-e0, trace(mul(da, true, _))));
+        // e1-e0 = trace[df(A)/dA^T _] となっているはず
+        System.out.printf("A: % e\n", re(e1-e0, trace(mul(da, true, _, false))));
       }
       {
         // ランダムな微小変化配列を作る
-        double[][] _ = new double[n][m];
-        double[][] C = new double[n][m];
+        double[][] _ = new double[n][m+1];
+        double[][] C = new double[n][m+1];
         for (int j = 0; j < n; ++j) {
-          for (int i = 0; i < m; ++i) {
+          for (int i = 0; i <= m; ++i) {
             _[j][i] = engine.nextDouble() * 1e-6;
-            C[j][i] = c[j][i] + _[j][i];
+            C[j][i] = b[j][i] + _[j][i];
           }
         }
 
-        double e1 = type.error(x, cypd(C, y[1], d, type));
+        double e1 = type.error(x, cy(C, y[1], type));
 
-        // e0-e1 = trace[df(A)/dC^T _] となっているはず
-        System.out.printf("C: % e\n", re(e1-e0, trace(mul(dc, true, _))));
+        // e1-e0 = trace[df(A)/dC^T _] となっているはず
+        System.out.printf("C: % e\n", re(e1-e0, trace(mul(db, true, _, false))));
       }
     }
   }
@@ -565,17 +558,13 @@ final class Autoencoder {
     double gamma = 1.0 - alpha * beta;
     if (gamma < 1.0) {
       for (int k = 0; k < m; ++k) {
-        for (int j = 0; j < n; ++j) {
+        for (int j = 0; j <= n; ++j) {
           a[k][j] *= gamma;
-        }/* always */{
-          b[k]    *= gamma;
         }
       }
       for (int j = 0; j < n; ++j) {
-        for (int k = 0; k < m; ++k) {
-          c[j][k] *= gamma;
-        }/* always */{
-          d[j]    *= gamma;
+        for (int k = 0; k <= m; ++k) {
+          b[j][k] *= gamma;
         }
       }
     }
@@ -586,71 +575,54 @@ final class Autoencoder {
     //   dL/db = A (dL/dd)
     //   dL/dA =   (dL/db) x^T
     for (int k = 0; k < m; ++k) {
-      for (int j = 0; j < n; ++j) {
+      for (int j = 0; j <= n; ++j) {
         da[k][j] = 0.0;
-      }/* always */{
-        db[k]    = 0.0;
       }
     }
     for (int j = 0; j < n; ++j) {
-      for (int k = 0; k < m; ++k) {
-        dc[j][k] = 0.0;
-      }/* always */{
-        dd[j]    = 0.0;
+      for (int k = 0; k <= m; ++k) {
+        db[j][k] = 0.0;
       }
     }
 
-/*
-    double[] w = new double[n];
-    for (int i = 0; i < n; ++i) {
-      w[i] = type.noise(x[i], engine);
-    }
-*/
     for (int i = 0; i < size; ++i) {
-      double[][] y = axpb(a, x[i], b, unit);
-      double[]   z = cypd(c, y[1], d, type);
+      double[][] y = ax(a, x[i], unit);
+      double[]   z = cy(b, y[1], type);
       double[]   e = sub(x[i], z);
-
-      //double[] atax = mul(a, true, mul(a, false, x   ));
-      //double[] ctcy = mul(c, true, mul(c, false, y[1]));
 
       // Gradient:
       for (int k = 0; k < m; ++k) {
         double sum = 0.0;
         // C^T(x-z) * y * (1-y)
         for (int j = 0; j < n; ++j) {
-          sum += c[j][k] * e[j];
+          sum += b[j][k] * e[j];
         }
         sum *= unit.g(y[0][k], y[1][k]);
 
         for (int j = 0; j < n; ++j) {
           da[k][j] += sum * x[i][j];
         }/* always */{
-          db[k]    += sum;
+          da[k][n] += sum;
         }
       }
       for (int j = 0; j < n; ++j) {
         for (int k = 0; k < m; ++k) {
-          dc[j][k] += e[j] * y[1][k];
+          db[j][k] += e[j] * y[1][k];
         }/* always */{
-          dd[j]    += e[j];
+          db[j][m] += e[j];
         }
       }
     }
 
     // update
     for (int k = 0; k < m; ++k) {
-      for (int j = 0; j < n; ++j) {
+      for (int j = 0; j <= n; ++j) {
         a[k][j] += alpha * da[k][j];
-      }/* always */{
-        b[k]    += alpha * db[k];
       }
     }
     for (int j = 0; j < n; ++j) {
-      for (int k = 0; k < m; ++k) {
-        c[j][k] += alpha * dc[j][k];
-      }/* always */{
-        d[j]    += alpha * dd[j];
+      for (int k = 0; k <= m; ++k) {
+        b[j][k] += alpha * db[j][k];
       }
     }
   }
@@ -663,28 +635,27 @@ final class Autoencoder {
     System.out.println();
   }
 
-  private static void show(String name, double[][] a, double[] b) {
+  private static void show(String name, double[][] a) {
     System.out.printf("%s:\n", name);
     for (int i = 0, size = a.length; i < size; ++i) {
       for (double _ : a[i]) {
         System.out.printf("\t% 3.2f", _);
       }/* always */{
-        System.out.printf("\t% 3.2f", b[i]);
-      }/* always */{
         System.out.println();
       }
+    }/* always */{
+      System.out.println();
     }
-    System.out.println();
   }
 
   private void show() {
-    show("a", a, b);
-    show("c", c, d);
+    show("a", a);
+    show("b", b);
   }
 
   private void show(double[] x) {
-    double[] y = axpb(a, x, b, unit)[1];
-    double[] z = cypd(c, y, d, type);
+    double[] y = ax(a, x, unit)[1];
+    double[] z = cy(b, y, type);
 
     System.out.printf("% 1.2e\n", type.error(x, z));
 
@@ -724,9 +695,9 @@ final class Autoencoder {
 
     // BINOMIAL, MULTICLASS, REAL, NONNEGATIVE
     // SIGMOID, TANH, RELU, LREL, SOFTPLUS
-    Autoencoder encoder = new Autoencoder(Type.NONNEGATIVE, Unit.TANH, 0.0, length, length/2);
+    Autoencoder encoder = new Autoencoder(Type.BINOMIAL, Unit.TANH, 0.0, length, length/2, engine);
 
-    for (int e = 1; e <= 1000; ++e) {
+    for (int e = 1; e <= 10000; ++e) {
       encoder.learn(size, x, 1.0 / (Math.sqrt(e) * length), engine);
     }
     for (int i = 0; i < size; ++i) {
