@@ -108,7 +108,7 @@ final class Autoencoder {
         }
       }
 
-      // 交差エントロピー: -x log(z) - (1-x) log(1-z)
+      // 負の交差エントロピー: x log(z) + (1-x) log(1-z)
       @Override
       double error(double[] x, double[] z) {
         assert(x.length == z.length);
@@ -118,7 +118,7 @@ final class Autoencoder {
           retval +=       x[i]  * Math.log(      z[i])
                  + (1.0 - x[i]) * Math.log(1.0 - z[i]);
         }
-        return -retval;
+        return retval;
       }
     },
 
@@ -172,7 +172,7 @@ final class Autoencoder {
         }
       }
 
-      // 交差エントロピー : -x log(z)
+      // 負の交差エントロピー : x log(z)
       @Override
       double error(double[] x, double[] z) {
         assert(x.length == z.length);
@@ -181,7 +181,7 @@ final class Autoencoder {
         for (int i = 0, length = x.length; i < length; ++i) {
           retval += x[i] * Math.log(z[i]);
         }
-        return -retval;
+        return retval;
       }
     },
 
@@ -212,7 +212,7 @@ final class Autoencoder {
         }
       }
 
-      // 二乗誤差: 1/2 (x - z)^2
+      // 負の二乗誤差: -1/2 (x - z)^2
       @Override
       double error(double[] x, double[] z) {
         assert(x.length == z.length);
@@ -222,11 +222,11 @@ final class Autoencoder {
           double e = x[i] - z[i];
           retval += e * e;
         }
-        return 0.5 * retval;
+        return -0.5 * retval;
       }
     },
 
-    NONNEGATIVE{
+    NONNEGATIVE {
       @Override
       double[] random(int length, Random engine) {
         double[] x = new double[length];
@@ -254,14 +254,19 @@ final class Autoencoder {
         }
       }
 
-      // I-ダイバージェンス: x log(x/z) + (x - z)
+      // 負の I-ダイバージェンス: (x - z) - x log(x/z)
       @Override
       double error(double[] x, double[] z) {
         assert(x.length == z.length);
 
+        // NOTE: x,Log(x) は最適化に関係しないので省略
         double retval = 0.0;
         for (int i = 0, length = x.length; i < length; ++i) {
-          retval += z[i] - x[i] * Math.log(z[i]);
+          if (x[i] > 0.0) {
+            retval += x[i] * Math.log(z[i]);
+          }/* always */{
+            retval -= z[i];
+          }
         }
         return retval;
       }
@@ -519,7 +524,7 @@ final class Autoencoder {
         double e1 = type.error(x, cypd(c, axpb(A, x, b, unit)[1], d, type));
 
         // e0-e1 = trace[df(A)/dA^T _] となっているはず
-        System.out.printf("A: % e\n", re(e0-e1, trace(mul(da, true, _))));
+        System.out.printf("A: % e\n", re(e1-e0, trace(mul(da, true, _))));
       }
       {
         // ランダムな微小変化配列を作る
@@ -535,14 +540,14 @@ final class Autoencoder {
         double e1 = type.error(x, cypd(C, y[1], d, type));
 
         // e0-e1 = trace[df(A)/dC^T _] となっているはず
-        System.out.printf("C: % e\n", re(e0-e1, trace(mul(dc, true, _))));
+        System.out.printf("C: % e\n", re(e1-e0, trace(mul(dc, true, _))));
       }
     }
   }
 
   // 相対誤差
   private static double re(double x, double z) {
-    return (x - z) / x;
+    return (x != 0) ? (x - z) / x : 0.0;
   }
 
   private static double trace(double[][] a) {
@@ -653,7 +658,7 @@ final class Autoencoder {
   private static void show(String name, double[] x) {
     System.out.printf("%s: ", name);
     for (double a : x) {
-      System.out.printf("\t% 1.0f", a);
+      System.out.printf("\t% 4.3f", a);
     }
     System.out.println();
   }
@@ -717,9 +722,11 @@ final class Autoencoder {
 
     Random engine = new Random();
 
-    Autoencoder encoder = new Autoencoder(Type.MULTICLASS, Unit.SIGMOID, 0.0, length, length/2);
+    // BINOMIAL, MULTICLASS, REAL, NONNEGATIVE
+    // SIGMOID, TANH, RELU, LREL, SOFTPLUS
+    Autoencoder encoder = new Autoencoder(Type.NONNEGATIVE, Unit.TANH, 0.0, length, length/2);
 
-    for (int e = 1; e <= 100000; ++e) {
+    for (int e = 1; e <= 1000; ++e) {
       encoder.learn(size, x, 1.0 / (Math.sqrt(e) * length), engine);
     }
     for (int i = 0; i < size; ++i) {
