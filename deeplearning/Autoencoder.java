@@ -325,7 +325,8 @@ final class Autoencoder {
     SOFTPLUS {
       @Override
       double f(double x) {
-        return Math.log(1.0 + Math.exp(x));
+        //return Math.log(1.0 + Math.exp(x));
+        return Math.max(0.0, x) + Math.log(1.0 + Math.exp(-Math.abs(x)));
       }
 
       @Override
@@ -695,7 +696,7 @@ final class Autoencoder {
 
     // BINOMIAL, MULTICLASS, REAL, NONNEGATIVE
     // SIGMOID, TANH, RELU, LREL, SOFTPLUS
-    Autoencoder encoder = new Autoencoder(Type.BINOMIAL, Unit.TANH, 0.0, length, length/2, engine);
+    Autoencoder encoder = new Autoencoder(Type.BINOMIAL, Unit.SOFTPLUS, 0.0, length, length/2, engine);
 
     for (int e = 1; e <= 10000; ++e) {
       encoder.learn(size, x, 1.0 / (Math.sqrt(e) * length), engine);
