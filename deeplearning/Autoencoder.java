@@ -364,7 +364,7 @@ final class Autoencoder {
   }
 
   // z = f(B y)
-  private static double[] cy(double[][] b, double[] y, Type type) {
+  private static double[] by(double[][] b, double[] y, Type type) {
     int m = y.length;
     int n = b.length;
     double[] z = new double[n];
@@ -476,12 +476,12 @@ final class Autoencoder {
 
       // 誤差をはかる
       double[][] y = ax(a, x   , unit);
-      double[]   z = cy(b, y[1], type);
+      double[]   z = by(b, y[1], type);
 
       // df(A)/dA を作る
       for (int k = 0; k < m; ++k) {
         double sum = 0.0;
-        // C^T(x-z) * y * (1-y)
+        // B^T(x-z) * y * (1-y)
         for (int j = 0; j < n; ++j) {
           sum += b[j][k] * (x[j] - z[j]);
         }
@@ -506,35 +506,35 @@ final class Autoencoder {
       double e0 = type.error(x, z);
       {
         // ランダムな微小変化配列を作る
-        double[][] _ = new double[m][n+1];
+        double[][] D = new double[m][n+1];
         double[][] A = new double[m][n+1];
         for (int i = 0; i < m; ++i) {
           for (int j = 0; j <= n; ++j) {
-            _[i][j] = engine.nextDouble() * 1e-6;
-            A[i][j] = a[i][j] + _[i][j];
+            D[i][j] = engine.nextDouble() * 1e-6;
+            A[i][j] = a[i][j] + D[i][j];
           }
         }
 
-        double e1 = type.error(x, cy(b, ax(A, x, unit)[1], type));
+        double e1 = type.error(x, by(b, ax(A, x, unit)[1], type));
 
-        // e1-e0 = trace[df(A)/dA^T _] となっているはず
-        System.out.printf("A: % e\n", re(e1-e0, trace(mul(da, true, _, false))));
+        // e1-e0 = trace[df(A)/dA^T D] となっているはず
+        System.out.printf("A: % e\n", re(e1-e0, trace(mul(da, true, D, false))));
       }
       {
         // ランダムな微小変化配列を作る
-        double[][] _ = new double[n][m+1];
-        double[][] C = new double[n][m+1];
+        double[][] D = new double[n][m+1];
+        double[][] B = new double[n][m+1];
         for (int j = 0; j < n; ++j) {
           for (int i = 0; i <= m; ++i) {
-            _[j][i] = engine.nextDouble() * 1e-6;
-            C[j][i] = b[j][i] + _[j][i];
+            D[j][i] = engine.nextDouble() * 1e-6;
+            B[j][i] = b[j][i] + D[j][i];
           }
         }
 
-        double e1 = type.error(x, cy(C, y[1], type));
+        double e1 = type.error(x, by(B, y[1], type));
 
-        // e1-e0 = trace[df(A)/dC^T _] となっているはず
-        System.out.printf("C: % e\n", re(e1-e0, trace(mul(db, true, _, false))));
+        // e1-e0 = trace[df(A)/dC^T D] となっているはず
+        System.out.printf("B: % e\n", re(e1-e0, trace(mul(db, true, D, false))));
       }
     }
   }
@@ -576,19 +576,15 @@ final class Autoencoder {
     //   dL/db = A (dL/dd)
     //   dL/dA =   (dL/db) x^T
     for (int k = 0; k < m; ++k) {
-      for (int j = 0; j <= n; ++j) {
-        da[k][j] = 0.0;
-      }
+      Arrays.fill(da[k], 0.0);
     }
     for (int j = 0; j < n; ++j) {
-      for (int k = 0; k <= m; ++k) {
-        db[j][k] = 0.0;
-      }
+      Arrays.fill(db[j], 0.0);
     }
 
     for (int i = 0; i < size; ++i) {
       double[][] y = ax(a, x[i], unit);
-      double[]   z = cy(b, y[1], type);
+      double[]   z = by(b, y[1], type);
       double[]   e = sub(x[i], z);
 
       // Gradient:
@@ -638,15 +634,14 @@ final class Autoencoder {
 
   private static void show(String name, double[][] a) {
     System.out.printf("%s:\n", name);
-    for (int i = 0, size = a.length; i < size; ++i) {
-      for (double _ : a[i]) {
-        System.out.printf("\t% 3.2f", _);
+    for (double[] ai : a) {
+      for (double aij : ai) {
+        System.out.printf("\t% 3.2f", aij);
       }/* always */{
         System.out.println();
       }
-    }/* always */{
-      System.out.println();
     }
+    System.out.println();
   }
 
   private void show() {
@@ -656,7 +651,7 @@ final class Autoencoder {
 
   private void show(double[] x) {
     double[] y = ax(a, x, unit)[1];
-    double[] z = cy(b, y, type);
+    double[] z = by(b, y, type);
 
     System.out.printf("% 1.2e\n", type.error(x, z));
 
@@ -696,7 +691,7 @@ final class Autoencoder {
 
     // BINOMIAL, MULTICLASS, REAL, NONNEGATIVE
     // SIGMOID, TANH, RELU, LREL, SOFTPLUS
-    Autoencoder encoder = new Autoencoder(Type.BINOMIAL, Unit.SOFTPLUS, 0.0, length, length/2, engine);
+    Autoencoder encoder = new Autoencoder(Type.MULTICLASS, Unit.SOFTPLUS, 0.0, length, length/2, engine);
 
     for (int e = 1; e <= 10000; ++e) {
       encoder.learn(size, x, 1.0 / (Math.sqrt(e) * length), engine);
