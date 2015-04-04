@@ -1,3 +1,8 @@
+
+/**
+ * cf. http://d.hatena.ne.jp/siokoshou/20090704
+ *     http://d.hatena.ne.jp/siokoshou/20090706
+ */
 final class BitMagic {
   private static final long LOG2_HASH = 0x03f566ed27179461L; // マジックナンバー
   private static final int[] log2_hash_table;
